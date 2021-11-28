@@ -81,7 +81,7 @@ class Screening:
 
     @property
     def _seats_taken(self) -> set[Seat]:
-        seats_taken = set()
+        seats_taken: set[Seat] = set()
         for reservation in self._reservations:
             seats_taken.union(reservation.seats)
         return seats_taken
