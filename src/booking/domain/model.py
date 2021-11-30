@@ -11,6 +11,10 @@ class SeatsCollide(Exception):
     pass
 
 
+class ReservationDoesNotExists(Exception):
+    pass
+
+
 @dataclass(frozen=True)
 class Seat:
     row: str
@@ -68,6 +72,17 @@ class Screening:
         if self._seats_collide(reservation):
             raise SeatsCollide("Some seats are already reserved")
         self._reservations.add(reservation)
+
+    def cancel(self, reservation_number: UUID):
+        try:
+            reservation = next(
+                reservation
+                for reservation in self._reservations
+                if reservation.reservation_number == reservation_number
+            )
+        except StopIteration:
+            raise ReservationDoesNotExists("Try an existing reservation")
+        self._reservations.remove(reservation)
 
     def _seats_collide(self, reservation: Reservation) -> bool:
         if reservation in self._reservations:
