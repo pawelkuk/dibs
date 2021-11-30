@@ -4,10 +4,6 @@ from uuid import UUID
 from domain import model
 
 
-class InvalidSku(Exception):
-    pass
-
-
 def make_reservation(
     screening_id: UUID,
     customer_id: UUID,
