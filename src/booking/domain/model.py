@@ -22,8 +22,8 @@ class Seat:
 
 
 class Theatre:
-    def __init__(self, id: UUID, seats: Iterable[Seat]):
-        self._id = id
+    def __init__(self, theatre_id: UUID, seats: Iterable[Seat]):
+        self.theatre_id = theatre_id
         self._seats = set(seats)
 
     @property
