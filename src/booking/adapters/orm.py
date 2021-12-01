@@ -98,5 +98,6 @@ def start_mappers():
                 reservations_mapper,
                 collection_class=set,
             ),
+            "theatre": relationship(theatres_mapper),
         },
     )
