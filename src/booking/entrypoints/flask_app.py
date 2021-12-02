@@ -16,13 +16,16 @@ orm.start_mappers()
 
 @app.route("/make-reservation", methods=["POST"])
 def add_batch():
-    services.make_reservation(
-        customer_id=request.json["customer_id"],
-        screening_id=request.json["screening_id"],
-        reservation_number=request.json["reservation_number"],
-        seats_data=request.json["seats_data"],
-        uow=unit_of_work.SqlAlchemyUnitOfWork(),
-    )
+    try:
+        services.make_reservation(
+            customer_id=request.json["customer_id"],
+            screening_id=request.json["screening_id"],
+            reservation_number=request.json["reservation_number"],
+            seats_data=request.json["seats_data"],
+            uow=unit_of_work.SqlAlchemyUnitOfWork(),
+        )
+    except model.SeatsCollide as e:
+        return {"message": str(e)}, 400
     return "OK", 201
 
 
