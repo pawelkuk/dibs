@@ -61,8 +61,8 @@ theatres = Table(
 seats = Table(
     "seats",
     metadata,
-    Column("row", String(3), nullable=False),
-    Column("place", Integer, nullable=False),
+    Column("row", String(3), nullable=False, primary_key=True),
+    Column("place", Integer, nullable=False, primary_key=True),
 )
 
 
