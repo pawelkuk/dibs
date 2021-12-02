@@ -1,0 +1,40 @@
+import sys
+import os
+
+sys.path.insert(0, os.getcwd())
+from pprint import pprint
+
+pprint(sys.path)
+from flask import Flask, request
+from booking.domain import model
+from booking.adapters import orm
+from booking.service_layer import services, unit_of_work
+
+app = Flask(__name__)
+orm.start_mappers()
+
+
+@app.route("/make-reservation", methods=["POST"])
+def add_batch():
+    services.make_reservation(
+        customer_id=request.json["customer_id"],
+        screening_id=request.json["screening_id"],
+        reservation_number=request.json["reservation_number"],
+        seats_data=request.json["seats_data"],
+        uow=unit_of_work.SqlAlchemyUnitOfWork(),
+    )
+    return "OK", 201
+
+
+@app.route("/cancel-reservation", methods=["POST"])
+def allocate_endpoint():
+    try:
+        services.cancel_reservation(
+            reservation_number=request.json["customer_id"],
+            screening_id=request.json["screening_id"],
+            uow=unit_of_work.SqlAlchemyUnitOfWork(),
+        )
+    except model.ReservationDoesNotExists as e:
+        return {"message": str(e)}, 404
+
+    return "OK", 204
