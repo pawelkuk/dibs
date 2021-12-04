@@ -1,4 +1,3 @@
-from enum import auto
 from sqlalchemy import Table, MetaData, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import mapper, relationship
 from sqlalchemy.dialects.postgresql import UUID
