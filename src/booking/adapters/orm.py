@@ -1,7 +1,10 @@
+from enum import auto
 from sqlalchemy import Table, MetaData, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import mapper, relationship
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
+
+from sqlalchemy.sql.schema import UniqueConstraint
 from booking.domain import model
 
 metadata = MetaData()
@@ -39,16 +42,14 @@ reservations_seats = Table(
         ForeignKey("reservations.reservation_number"),
         primary_key=True,
     ),
-    Column("row", ForeignKey("seats.row"), primary_key=True),
-    Column("place", ForeignKey("seats.place"), primary_key=True),
+    Column("seat_id", ForeignKey("seats.seat_id"), primary_key=True),
 )
 
 theatres_seats = Table(
     "theatres_seats",
     metadata,
     Column("theatre_id", ForeignKey("theatres.theatre_id"), primary_key=True),
-    Column("row", ForeignKey("seats.row"), primary_key=True),
-    Column("place", ForeignKey("seats.place"), primary_key=True),
+    Column("seat_id", ForeignKey("seats.seat_id"), primary_key=True),
 )
 
 theatres = Table(
@@ -61,8 +62,10 @@ theatres = Table(
 seats = Table(
     "seats",
     metadata,
-    Column("row", String(3), nullable=False, primary_key=True),
-    Column("place", Integer, nullable=False, primary_key=True),
+    Column("seat_id", Integer, autoincrement=True, primary_key=True),
+    Column("row", String(3), nullable=False),
+    Column("place", Integer, nullable=False),
+    UniqueConstraint("row", "place", name="row_place_unique"),
 )
 
 
