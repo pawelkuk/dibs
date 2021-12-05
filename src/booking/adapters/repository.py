@@ -1,6 +1,6 @@
 import abc
 from uuid import UUID
-from domain import model
+from booking.domain import model
 
 
 class AbstractRepository(abc.ABC):

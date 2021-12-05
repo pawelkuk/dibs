@@ -13,9 +13,8 @@ from booking.service_layer import services, unit_of_work
 app = Flask(__name__)
 orm.start_mappers()
 
-
 @app.route("/make-reservation", methods=["POST"])
-def add_batch():
+def make_reservation():
     try:
         services.make_reservation(
             customer_id=request.json["customer_id"],
@@ -30,7 +29,7 @@ def add_batch():
 
 
 @app.route("/cancel-reservation", methods=["POST"])
-def allocate_endpoint():
+def cancel_reservation():
     try:
         services.cancel_reservation(
             reservation_number=request.json["customer_id"],
