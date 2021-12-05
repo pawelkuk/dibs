@@ -2,15 +2,16 @@ from sqlalchemy import Table, MetaData, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import mapper, relationship
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-
+from sqlalchemy.orm import registry
 from sqlalchemy.sql.schema import UniqueConstraint
 from booking.domain import model
 
 metadata = MetaData()
+mapper_registry = registry()
 
 screenings = Table(
     "screenings",
-    metadata,
+    mapper_registry.metadata,
     Column("screening_id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     Column("theatre_id", ForeignKey("theatres.theatre_id")),
     Column("movie_id", ForeignKey("movies.movie_id")),
@@ -18,14 +19,14 @@ screenings = Table(
 
 movies = Table(
     "movies",
-    metadata,
+    mapper_registry.metadata,
     Column("movie_id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     Column("title", String(255)),
 )
 
 reservations = Table(
     "reservations",
-    metadata,
+    mapper_registry.metadata,
     Column(
         "reservation_number", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     ),
@@ -35,7 +36,7 @@ reservations = Table(
 
 reservations_seats = Table(
     "reservations_seats",
-    metadata,
+    mapper_registry.metadata,
     Column(
         "reservation_number",
         ForeignKey("reservations.reservation_number"),
@@ -46,21 +47,21 @@ reservations_seats = Table(
 
 theatres_seats = Table(
     "theatres_seats",
-    metadata,
+    mapper_registry.metadata,
     Column("theatre_id", ForeignKey("theatres.theatre_id"), primary_key=True),
     Column("seat_id", ForeignKey("seats.seat_id"), primary_key=True),
 )
 
 theatres = Table(
     "theatres",
-    metadata,
+    mapper_registry.metadata,
     Column("theatre_id", UUID(as_uuid=True), primary_key=True, default=uuid.uuid4),
     Column("name", String(255)),
 )
 
 seats = Table(
     "seats",
-    metadata,
+    mapper_registry.metadata,
     Column("seat_id", Integer, autoincrement=True, primary_key=True),
     Column("row", String(3), nullable=False),
     Column("place", Integer, nullable=False),
@@ -69,8 +70,8 @@ seats = Table(
 
 
 def start_mappers():
-    seats_mapper = mapper(model.Seat, seats)
-    theatres_mapper = mapper(
+    seats_mapper = mapper_registry.map_imperatively(model.Seat, seats)
+    theatres_mapper = mapper_registry.map_imperatively(
         model.Theatre,
         theatres,
         properties={
@@ -81,7 +82,7 @@ def start_mappers():
             )
         },
     )
-    reservations_mapper = mapper(
+    reservations_mapper = mapper_registry.map_imperatively(
         model.Reservation,
         reservations,
         properties={
@@ -92,7 +93,7 @@ def start_mappers():
             )
         },
     )
-    mapper(
+    mapper_registry.map_imperatively(
         model.Screening,
         screenings,
         properties={
