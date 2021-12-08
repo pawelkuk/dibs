@@ -27,7 +27,6 @@ class SqlAlchemyRepository(AbstractRepository):
             .first()
         )
 
-
 class FakeRepository(AbstractRepository):
     def __init__(self, session):
         self.session = session

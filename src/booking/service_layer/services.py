@@ -1,7 +1,7 @@
 from typing import Iterable
 from service_layer import unit_of_work
 from uuid import UUID
-from domain import model
+from booking.adapters import orm
 
 
 def make_reservation(
@@ -11,10 +11,10 @@ def make_reservation(
     seats_data: Iterable[tuple[str, int]],
     uow: unit_of_work.AbstractUnitOfWork,
 ):
+    seats = [orm.model.Seat(*seat) for seat in seats_data]
     with uow:
-        screening: model.Screening = uow.screenings.get(screening_id=screening_id)
-        seats = [model.Seat(*seat) for seat in seats_data]
-        reservation = model.Reservation(seats, customer_id, reservation_number)
+        reservation = orm.model.Reservation(seats, customer_id, reservation_number)
+        screening: orm.model.Screening = uow.screenings.get(screening_id=screening_id)
         screening.make(reservation=reservation)
         uow.commit()
 
@@ -25,6 +25,6 @@ def cancel_reservation(
     uow: unit_of_work.AbstractUnitOfWork,
 ):
     with uow:
-        screening: model.Screening = uow.screenings.get(screening_id=screening_id)
+        screening: orm.model.Screening = uow.screenings.get(screening_id=screening_id)
         screening.cancel(reservation_number)
         uow.commit()

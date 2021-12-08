@@ -1,12 +1,11 @@
-from sqlalchemy import Table, MetaData, Column, Integer, String, ForeignKey
-from sqlalchemy.orm import mapper, relationship
+from sqlalchemy import Table, Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from sqlalchemy.orm import registry
 from sqlalchemy.sql.schema import UniqueConstraint
 from booking.domain import model
 
-metadata = MetaData()
 mapper_registry = registry()
 
 screenings = Table(
@@ -71,6 +70,7 @@ seats = Table(
 
 def start_mappers():
     seats_mapper = mapper_registry.map_imperatively(model.Seat, seats)
+    mapper_registry.map_imperatively(model.Movie, movies)
     theatres_mapper = mapper_registry.map_imperatively(
         model.Theatre,
         theatres,

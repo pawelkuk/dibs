@@ -15,10 +15,15 @@ class ReservationDoesNotExists(Exception):
     pass
 
 
-@dataclass(frozen=True)
+@dataclass(unsafe_hash=True)
 class Seat:
     row: str
     place: int
+
+@dataclass(unsafe_hash=True)
+class Movie:
+    movie_id: UUID
+    title: str
 
 
 class Theatre:
