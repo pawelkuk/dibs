@@ -15,12 +15,13 @@ class ReservationDoesNotExists(Exception):
     pass
 
 
-@dataclass(unsafe_hash=True)
+@dataclass
 class Seat:
     row: str
     place: int
 
-@dataclass(unsafe_hash=True)
+
+@dataclass
 class Movie:
     movie_id: UUID
     title: str

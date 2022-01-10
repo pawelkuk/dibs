@@ -1,6 +1,7 @@
 import abc
 from uuid import UUID
 from booking.domain import model
+from djangoproject.alloc import models as django_models
 
 
 class AbstractRepository(abc.ABC):
@@ -36,3 +37,19 @@ class FakeRepository(AbstractRepository):
 
     def get(self, screening_id: UUID) -> model.Screening:
         return self.session[screening_id]
+
+class DjangoRepository(AbstractRepository):
+    def add(self, batch):
+        super().add(batch)
+        self.update(batch)
+
+    def update(self, batch):
+        django_models.Batch.update_from_domain(batch)
+
+    def _get(self, reference):
+        return (
+            django_models.Batch.objects.filter(reference=reference).first().to_domain()
+        )
+
+    def list(self):
+        return [b.to_domain() for b in django_models.Batch.objects.all()]

@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 
 from booking import config
-
+from django.db import transaction
 
 class AbstractUnitOfWork(abc.ABC):
     screenings: repository.AbstractRepository
@@ -53,3 +53,23 @@ class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
 
     def rollback(self):
         self.session.rollback()
+
+
+
+class DjangoUnitOfWork(AbstractUnitOfWork):
+    def __enter__(self):
+        self.batches = repository.DjangoRepository()
+        transaction.set_autocommit(False)
+        return super().__enter__()
+
+    def __exit__(self, *args):
+        super().__exit__(*args)
+        transaction.set_autocommit(True)
+
+    def commit(self):
+        for batch in self.batches.seen:
+            self.batches.update(batch)
+        transaction.commit()
+
+    def rollback(self):
+        transaction.rollback()
