@@ -1,19 +1,6 @@
 from django.db import models
 from booking.domain import model
-
-
-class Seat(models.Model):
-    row = models.CharField(max_length=255, null=False)
-    place = models.PositiveBigIntegerField(null=False)
-
-    class Meta:
-        unique_together = ("row", "place")
-        indexes = [
-            models.Index(fields=["row", "place"]),
-        ]
-
-    def to_domain(self) -> model.Seat:
-        return model.Seat(self.row, self.place)
+from django.contrib.postgres.fields import ArrayField
 
 
 class Movie(models.Model):
@@ -23,14 +10,29 @@ class Movie(models.Model):
     def to_domain(self) -> model.Movie:
         return model.Movie(self.movie_id, self.title)
 
+    @staticmethod
+    def from_domain(movie: model.Movie):
+        m, _ = Movie.objects.get_or_create(movie_id=movie.movie_id, title=movie.title)
+        return m
+
 
 class Theatre(models.Model):
     theatre_id = models.UUIDField(primary_key=True)
-    seats = models.ManyToManyField(Seat)
+    seats = ArrayField(
+        ArrayField(models.CharField(max_length=3, null=False), size=2),
+    )
 
     def to_domain(self) -> model.Theatre:
-        seats = (seat.to_domain() for seat in self.seats)
+        seats = (model.Seat(row=seat[0], place=seat[1]) for seat in self.seats)
         return model.Theatre(self.theatre_id, seats)
+
+    @staticmethod
+    def from_domain(theatre: model.Theatre):
+        t, _ = Theatre.objects.get_or_create(
+            theatre_id=theatre.theatre_id,
+            seats=[[s.row, s.place] for s in theatre.seats],
+        )
+        return t
 
 
 class Screening(models.Model):
@@ -44,10 +46,25 @@ class Screening(models.Model):
             reservations, self.theatre, self.movie.id, self.screening_id
         )
 
+    @staticmethod
+    def update_from_domain(screening: model.Screening):
+        try:
+            s = Screening.objects.get(screening_id=screening.screening_id)
+        except Screening.DoesNotExist:
+            s = Screening(screening_id=screening.screening_id)
+            s.movie = (Movie.from_domain(screening.movie),)
+            s.theatre = (Theatre.from_domain(screening.theatre),)
+            s.save()
+            s.reservations.set(
+                Reservation.from_domain(r) for r in screening._reservations
+            )
+
 
 class Reservation(models.Model):
     reservation_number = models.UUIDField(primary_key=True)
-    seats = models.ManyToManyField(Seat)
+    seats = ArrayField(
+        ArrayField(models.CharField(max_length=3, null=False), size=2, null=False),
+    )
     screening = models.ForeignKey(
         Screening, related_name="reservations", on_delete=models.CASCADE
     )
@@ -56,3 +73,12 @@ class Reservation(models.Model):
     def to_domain(self) -> model.Reservation:
         seats = (seat.to_domain() for seat in self.seats)
         return model.Reservation(seats, self.customer_id, self.reservation_number)
+
+    @staticmethod
+    def from_domain(reservation: model.Reservation):
+        r, _ = Reservation.objects.get_or_create(
+            reservation_number=reservation.reservation_number,
+            seats=[[s.row, s.place] for s in reservation.seats],
+            customer_id=reservation.customer_id,
+        )
+        return r

@@ -66,13 +66,13 @@ class Screening:
         self,
         reservations: Iterable[Reservation],
         theatre: Theatre,
-        movie_id: UUID,
+        movie: Movie,
         screening_id: UUID,
     ):
         self.screening_id = screening_id
         self._reservations = set(reservations)
         self.theatre = theatre
-        self.movie_id = movie_id
+        self.movie = movie
 
     def make(self, reservation: Reservation):
         if self._seats_collide(reservation):
