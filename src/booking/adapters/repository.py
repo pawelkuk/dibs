@@ -1,55 +1,41 @@
 import abc
 from uuid import UUID
 from booking.domain import model
-from djangoproject.alloc import models as django_models
+from api.booking import models as django_models
 
 
 class AbstractRepository(abc.ABC):
-    @abc.abstractmethod
+    def __init__(self):
+        self.seen: set[model.Screening] = set()
+
     def add(self, screening: model.Screening):
+        self.seen.add(screening)
+
+    def get(self, screening_id: UUID) -> model.Screening:
+        p = self._get(screening_id)
+        if p:
+            self.seen.add(p)
+        return p
+
+    @abc.abstractmethod
+    def _get(self, screening_id: UUID) -> model.Screening:
         raise NotImplementedError
 
-    @abc.abstractmethod
-    def get(self, screening_id: UUID) -> model.Screening:
-        raise NotImplementedError
-
-
-class SqlAlchemyRepository(AbstractRepository):
-    def __init__(self, session):
-        self.session = session
-
-    def add(self, screening: model.Screening):
-        self.session.add(screening)
-
-    def get(self, screening_id: UUID) -> model.Screening:
-        return (
-            self.session.query(model.Screening)
-            .filter_by(screening_id=screening_id)
-            .first()
-        )
-
-class FakeRepository(AbstractRepository):
-    def __init__(self, session):
-        self.session = session
-
-    def add(self, screening: model.Screening):
-        self.session[screening.screening_id] = screening
-
-    def get(self, screening_id: UUID) -> model.Screening:
-        return self.session[screening_id]
 
 class DjangoRepository(AbstractRepository):
-    def add(self, batch):
-        super().add(batch)
-        self.update(batch)
+    def add(self, screening: model.Screening):
+        super().add(screening)
+        self.update(screening)
 
-    def update(self, batch):
-        django_models.Batch.update_from_domain(batch)
+    def update(self, screening: model.Screening):
+        django_models.Screening.update_from_domain(screening)
 
-    def _get(self, reference):
+    def _get(self, screening_id: UUID) -> model.Screening:
         return (
-            django_models.Batch.objects.filter(reference=reference).first().to_domain()
+            django_models.Screening.objects.filter(screening_id=screening_id)
+            .first()
+            .to_domain()
         )
 
-    def list(self):
-        return [b.to_domain() for b in django_models.Batch.objects.all()]
+    def list(self) -> list[model.Screening]:
+        return [s.to_domain() for s in django_models.Screening.objects.all()]
