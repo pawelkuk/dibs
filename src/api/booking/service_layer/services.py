@@ -1,5 +1,5 @@
 from typing import Iterable
-from service_layer import unit_of_work
+from booking.service_layer import unit_of_work
 from uuid import UUID
 from booking.adapters import orm
 

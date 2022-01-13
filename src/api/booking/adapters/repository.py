@@ -1,7 +1,7 @@
 import abc
 from uuid import UUID
 from booking.domain import model
-from api.booking import models as django_models
+from booking import models as django_models
 
 
 class AbstractRepository(abc.ABC):
