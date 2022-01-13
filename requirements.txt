@@ -6,3 +6,4 @@ pytest
 alembic
 ipdb
 django
+dj-database-url

@@ -14,7 +14,6 @@ services:
       - PYTHONDONTWRITEBYTECODE=1
     volumes:
       - ./src/:/src/
-      - ./alembic.ini:/src/alembic.ini
     ports:
       - "5005:80"
 

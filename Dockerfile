@@ -3,6 +3,12 @@ FROM python:3.9-slim-buster
 COPY requirements.txt /
 RUN pip install -r /requirements.txt
 
+RUN mkdir -p /src
+COPY src/ /src/
+RUN pip install -e /src
+
 WORKDIR /src
-ENV FLASK_APP=booking/entrypoints/flask_app.py FLASK_DEBUG=1 PYTHONUNBUFFERED=1
-CMD flask --help && flask run --host=0.0.0.0 --port=80
+ENV DJANGO_SETTINGS_MODULE=api.settings
+CMD python /src/api/wait_for_postgres.py && \
+    python /src/api/manage.py migrate && \
+    python /src/api/manage.py runserver 0.0.0.0:80
