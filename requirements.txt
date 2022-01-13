@@ -7,3 +7,4 @@ alembic
 ipdb
 django
 dj-database-url
+ujson

@@ -15,7 +15,7 @@ class ReservationDoesNotExists(Exception):
     pass
 
 
-@dataclass
+@dataclass(frozen=True)
 class Seat:
     row: str
     place: int
