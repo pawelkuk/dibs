@@ -17,8 +17,8 @@ def make_reservation(request):
             uow=unit_of_work.DjangoUnitOfWork(),
         )
     except model.SeatsCollide as e:
-        return {"message": str(e)}, 400
-    return "OK", 201
+        return JsonResponse({"message": str(e)}, status=400)
+    return JsonResponse({"success": "True"}, status=201)
 
 
 @csrf_exempt

@@ -8,3 +8,4 @@ ipdb
 django
 dj-database-url
 ujson
+bpython

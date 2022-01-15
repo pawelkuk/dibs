@@ -1,10 +1,11 @@
 from django.db import models
 from booking.domain import model
 from django.contrib.postgres.fields import ArrayField
+import uuid
 
 
 class Movie(models.Model):
-    movie_id = models.UUIDField(primary_key=True)
+    movie_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=1023, null=False)
 
     def to_domain(self) -> model.Movie:
@@ -17,7 +18,7 @@ class Movie(models.Model):
 
 
 class Theatre(models.Model):
-    theatre_id = models.UUIDField(primary_key=True)
+    theatre_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     seats = ArrayField(
         ArrayField(models.CharField(max_length=3, null=False), size=2),
     )
@@ -36,7 +37,9 @@ class Theatre(models.Model):
 
 
 class Screening(models.Model):
-    screening_id = models.UUIDField(primary_key=True)
+    screening_id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
     theatre = models.ForeignKey(Theatre, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
 
@@ -61,7 +64,9 @@ class Screening(models.Model):
 
 
 class Reservation(models.Model):
-    reservation_number = models.UUIDField(primary_key=True)
+    reservation_number = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
     seats = ArrayField(
         ArrayField(models.CharField(max_length=3, null=False), size=2, null=False),
     )
