@@ -1,7 +1,7 @@
 # Master thesis
 
 ## TODO:
-- [ ] pgadmin init config
+- [x] pgadmin init config
 - [ ] implement db per app
 - [ ] paying service
 - [ ] ticketing service
