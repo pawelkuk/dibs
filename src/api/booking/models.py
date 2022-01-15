@@ -24,6 +24,9 @@ class Theatre(models.Model):
     )
 
     def to_domain(self) -> model.Theatre:
+        import ipdb
+
+        ipdb.set_trace()
         seats = (model.Seat(row=seat[0], place=seat[1]) for seat in self.seats)
         return model.Theatre(self.theatre_id, seats)
 
@@ -44,9 +47,9 @@ class Screening(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
 
     def to_domain(self) -> model.Screening:
-        reservations = (r.to_domain() for r in self.reservations)
+        reservations = (r.to_domain() for r in self.reservations.all())
         return model.Screening(
-            reservations, self.theatre, self.movie.id, self.screening_id
+            reservations, self.theatre, self.movie.movie_id, self.screening_id
         )
 
     @staticmethod
@@ -76,7 +79,7 @@ class Reservation(models.Model):
     customer_id = models.UUIDField(null=False)
 
     def to_domain(self) -> model.Reservation:
-        seats = (seat.to_domain() for seat in self.seats)
+        seats = (model.Seat(row=s[0], place=s[1]) for s in self.seats)
         return model.Reservation(seats, self.customer_id, self.reservation_number)
 
     @staticmethod

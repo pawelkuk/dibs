@@ -26,7 +26,7 @@ def cancel_reservation(request):
     data = json.loads(request.body)
     try:
         services.cancel_reservation(
-            reservation_number=data["customer_id"],
+            reservation_number=data["reservation_number"],
             screening_id=data["screening_id"],
             uow=unit_of_work.DjangoUnitOfWork(),
         )

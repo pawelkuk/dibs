@@ -30,7 +30,7 @@ class Movie:
 class Theatre:
     def __init__(self, theatre_id: UUID, seats: Iterable[Seat]):
         self.theatre_id = theatre_id
-        self._seats = set(seats)
+        self._seats = {seat for seat in seats}
 
     @property
     def seats(self):
@@ -45,7 +45,7 @@ class Reservation:
         # impact ease of testing, we will see
         self.reservation_number = reservation_number or uuid4()
         self.customer_id = customer_id
-        self._seats = set(seats)
+        self._seats = {seat for seat in seats}
 
     def add(self, seat: Seat):
         if seat not in self._seats:  # seat is available
