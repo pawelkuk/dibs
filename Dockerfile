@@ -11,5 +11,4 @@ WORKDIR /src
 ENV DJANGO_SETTINGS_MODULE=api.settings
 CMD python /src/api/wait_for_postgres.py && \
     python /src/api/manage.py migrate && \
-    python /src/api/manage.py initial_data && \
     python /src/api/manage.py runserver 0.0.0.0:80
