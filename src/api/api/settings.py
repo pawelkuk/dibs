@@ -33,13 +33,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "booking",
+    "paying",
+    "ticketing",
 ]
 
 MIDDLEWARE = [
@@ -76,7 +77,12 @@ WSGI_APPLICATION = "api.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-DATABASES = {"default": dj_database_url.parse(config.get_postgres_uri())}
+DATABASES = {
+    "default": dj_database_url.parse(config.get_postgres_uri("postgres")),
+    "booking": dj_database_url.parse(config.get_postgres_uri("postgres_booking")),
+    "paying": dj_database_url.parse(config.get_postgres_uri("postgres_paying")),
+    "ticketing": dj_database_url.parse(config.get_postgres_uri("postgres_ticketing")),
+}
 
 
 # Password validation
@@ -116,3 +122,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = "/static/"
+
+DATABASE_ROUTERS = [
+    "booking.routers.BookingRouter",
+    "ticketing.routers.TicketingRouter",
+    "paying.routers.PayingRouter",
+    "api.routers.DefaultRouter",
+]

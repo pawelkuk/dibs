@@ -1,12 +1,42 @@
 {
   "Servers": {
     "1": {
-      "Name": "postgres",
+      "Name": "default",
       "Group": "Servers",
       "Port": 5432,
       "Username": "postgres",
       "Password": "",
       "Host": "postgres",
+      "SSLMode": "prefer",
+      "MaintenanceDB": "postgres"
+    },
+    "2": {
+      "Name": "booking",
+      "Group": "Servers",
+      "Port": 5432,
+      "Username": "postgres",
+      "Password": "",
+      "Host": "postgres_booking",
+      "SSLMode": "prefer",
+      "MaintenanceDB": "postgres"
+    },
+    "3": {
+      "Name": "ticketing",
+      "Group": "Servers",
+      "Port": 5432,
+      "Username": "postgres",
+      "Password": "",
+      "Host": "postgres_ticketing",
+      "SSLMode": "prefer",
+      "MaintenanceDB": "postgres"
+    },
+    "4": {
+      "Name": "paying",
+      "Group": "Servers",
+      "Port": 5432,
+      "Username": "postgres",
+      "Password": "",
+      "Host": "postgres_paying",
       "SSLMode": "prefer",
       "MaintenanceDB": "postgres"
     }
