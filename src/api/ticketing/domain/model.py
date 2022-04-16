@@ -1,0 +1,44 @@
+from enum import Enum
+from uuid import UUID, uuid4
+import random
+
+
+class TicketRenderError(Exception):
+    pass
+
+
+class TicketStatus(Enum):
+    SUCCESS = "success"
+    FAILED = "failed"
+    PENDING = "pending"
+
+
+class Ticket:
+    def __init__(
+        self,
+        ticket_id: UUID,
+        reservation_id: UUID,
+        status: str,
+        details: dict,
+        ticket_url: str,
+    ) -> None:
+        self.ticket_id = ticket_id
+        self.reservation_id = reservation_id
+        self.status = status
+        self.details = details
+        self.ticket_url = ticket_url
+
+    def render(self):
+        if self.ticket_url and self.status == TicketStatus.SUCCESS:
+            return
+        if random.random() < 0.99:
+            # Happy path
+            self.ticket_url = Ticket.generate_ticket_url()
+            self.status = TicketStatus.SUCCESS
+        else:
+            self.status = TicketStatus.FAILED
+            raise TicketRenderError()
+
+    @staticmethod
+    def generate_ticket_url():
+        return f"/dibs_tickets/some-s3-path/{uuid4()}"
