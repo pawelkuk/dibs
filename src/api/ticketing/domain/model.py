@@ -28,7 +28,7 @@ class Ticket:
         self.details = details
         self.ticket_url = ticket_url
 
-    def render(self):
+    def render(self) -> str:
         if self.ticket_url and self.status == TicketStatus.SUCCESS:
             return
         if random.random() < 0.99:
@@ -37,8 +37,10 @@ class Ticket:
             self.status = TicketStatus.SUCCESS
         else:
             self.status = TicketStatus.FAILED
-            raise TicketRenderError()
+            raise TicketRenderError("Unknown error. Try again!")
+
+        return self.ticket_url
 
     @staticmethod
     def generate_ticket_url():
-        return f"/dibs_tickets/some-s3-path/{uuid4()}"
+        return f"/dibs_tickets/some-s3-path/{uuid4()}.pdf"
