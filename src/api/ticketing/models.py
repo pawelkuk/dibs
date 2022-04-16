@@ -24,7 +24,7 @@ class Ticket(models.Model):
         )
 
     @staticmethod
-    def from_domain(ticket: model.Ticket):
+    def update_from_domain(ticket: model.Ticket):
         t, _ = Ticket.objects.get_or_create(ticket_id=ticket.ticket_id)
         t.reservation_id = ticket.reservation_id
         t.status = ticket.status
