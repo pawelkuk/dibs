@@ -31,7 +31,9 @@ class Ticket:
     def render(self) -> str:
         if self.ticket_url and self.status == TicketStatus.SUCCESS:
             return
-        if random.random() < 0.99:
+        elif not self.ticket_id or not self.reservation_id or not self.details:
+            raise TicketRenderError("Insufficient information to render ticket!")
+        elif random.random() < 0.99:
             # Happy path
             self.ticket_url = Ticket.generate_ticket_url()
             self.status = TicketStatus.SUCCESS
