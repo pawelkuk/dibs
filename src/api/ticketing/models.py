@@ -25,7 +25,7 @@ class Ticket(models.Model):
     def update_from_domain(ticket: model.Ticket):
         t, _ = Ticket.objects.get_or_create(ticket_id=ticket.ticket_id)
         t.reservation_id = ticket.reservation_id
-        t.status = ticket.status
+        t.status = ticket.status.value
         t.details = ticket.details
         t.ticket_url = ticket.ticket_url
         t.save()
