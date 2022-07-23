@@ -23,7 +23,10 @@ class Payment(models.Model):
 
     @staticmethod
     def update_from_domain(payment: model.Payment):
-        p, _ = Payment.objects.get_or_create(payment_id=payment.payment_id)
+        try:
+            p = Payment.objects.get(payment_id=payment.payment_id)
+        except Payment.DoesNotExist:
+            p = Payment(payment_id=payment.payment_id)
         p.user_id = payment.user_id
         p.status = payment.status.value
         p.amount = payment.amount

@@ -33,7 +33,7 @@ class DjangoUnitOfWork(AbstractUnitOfWork):
         transaction.set_autocommit(True)
 
     def commit(self):
-        for payment in self.payments:
+        for payment in self.payments.seen:
             self.payments.update(payment)
         transaction.commit()
 

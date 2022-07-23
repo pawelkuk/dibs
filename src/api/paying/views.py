@@ -12,7 +12,7 @@ def pay(request: HttpRequest):
     try:
         payment_id = services.pay(
             amount=data["amount"],
-            currency=data["currency"],
+            currency=model.Currency[data["currency"]],
             user_id=uuid.UUID(data["user_id"]),
             uow=unit_of_work.DjangoUnitOfWork(),
         )

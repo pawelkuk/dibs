@@ -23,7 +23,10 @@ class Ticket(models.Model):
 
     @staticmethod
     def update_from_domain(ticket: model.Ticket):
-        t, _ = Ticket.objects.get_or_create(ticket_id=ticket.ticket_id)
+        try:
+            t = Ticket.objects.get(ticket_id=ticket.ticket_id)
+        except Ticket.DoesNotExist:
+            t = Ticket(ticket_id=ticket.ticket_id)
         t.reservation_id = ticket.reservation_id
         t.status = ticket.status.value
         t.details = ticket.details
