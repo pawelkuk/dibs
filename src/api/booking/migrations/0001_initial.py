@@ -10,39 +10,105 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Movie',
+            name="Movie",
             fields=[
-                ('movie_id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('title', models.CharField(max_length=1023)),
+                (
+                    "movie_id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("title", models.CharField(max_length=1023)),
             ],
         ),
         migrations.CreateModel(
-            name='Theatre',
+            name="Theatre",
             fields=[
-                ('theatre_id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('seats', django.contrib.postgres.fields.ArrayField(base_field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=3), size=2), size=None)),
+                (
+                    "theatre_id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "seats",
+                    django.contrib.postgres.fields.ArrayField(
+                        base_field=django.contrib.postgres.fields.ArrayField(
+                            base_field=models.CharField(max_length=3), size=2
+                        ),
+                        size=None,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Screening',
+            name="Screening",
             fields=[
-                ('screening_id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('movie', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='booking.movie')),
-                ('theatre', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='booking.theatre')),
+                (
+                    "screening_id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "movie",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="booking.movie"
+                    ),
+                ),
+                (
+                    "theatre",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="booking.theatre",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Reservation',
+            name="Reservation",
             fields=[
-                ('reservation_number', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('seats', django.contrib.postgres.fields.ArrayField(base_field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=3), size=2), size=None)),
-                ('customer_id', models.UUIDField()),
-                ('screening', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='reservations', to='booking.screening')),
+                (
+                    "reservation_number",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "seats",
+                    django.contrib.postgres.fields.ArrayField(
+                        base_field=django.contrib.postgres.fields.ArrayField(
+                            base_field=models.CharField(max_length=3), size=2
+                        ),
+                        size=None,
+                    ),
+                ),
+                ("customer_id", models.UUIDField()),
+                (
+                    "screening",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="reservations",
+                        to="booking.screening",
+                    ),
+                ),
             ],
         ),
     ]

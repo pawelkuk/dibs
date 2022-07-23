@@ -3,8 +3,7 @@
 ## TODO:
 - [x] pgadmin init config
 - [x] implement db per app
-- [ ] paying service
-- [ ] ticketing service
+- [x] paying service
+- [x] ticketing service
 - [ ] read model service
 - [ ] FE
-
