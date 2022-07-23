@@ -15,3 +15,14 @@ def pay(
         uow.payments.add(payment=payment)
         uow.commit()
     return payment_id
+
+
+def refund(
+    payment_id: UUID,
+    uow: unit_of_work.AbstractUnitOfWork,
+):
+    with uow:
+        payment: model.Payment = uow.payments.get(payment_id=payment_id)
+        payment_id = payment.refund()
+        uow.commit()
+    return payment_id

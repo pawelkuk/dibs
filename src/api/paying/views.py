@@ -19,3 +19,16 @@ def pay(request):
     except model.PaymentError as e:
         return JsonResponse({"message": str(e)}, status=400)
     return JsonResponse({"success": True, "payment_id": payment_id}, status=201)
+
+
+@csrf_exempt
+def refund(request):
+    data = json.loads(request.body)
+    try:
+        services.refund(
+            amount=data["payment_id"],
+            uow=unit_of_work.DjangoUnitOfWork(),
+        )
+    except model.PaymentError as e:
+        return JsonResponse({"message": str(e)}, status=400)
+    return JsonResponse({"success": True}, status=204)

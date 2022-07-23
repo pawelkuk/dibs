@@ -16,6 +16,7 @@ class Currency(Enum):
 class PaymentStatus(Enum):
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
+    CANCELED = "CANCELED"
 
 
 class Payment:
@@ -52,3 +53,15 @@ class Payment:
             self.status = PaymentStatus.FAILED
             self.payment_id = uuid4()
             raise PaymentError("Problem with payment provider. Try again!")
+
+    def refund(self) -> UUID:
+        if not self.payment_id or self.status != PaymentStatus.SUCCESS:
+            raise PaymentError("You can't get back a money you didn't pay")
+
+        self.request_to_payment_provider_refund()
+        self.status = PaymentStatus.CANCELED
+
+    def request_to_payment_provider_refund(self):
+        # This would be a request to a payment provider
+        # To simplify this case we assume this request always succeeds
+        ...
