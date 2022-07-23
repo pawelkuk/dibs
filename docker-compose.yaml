@@ -63,5 +63,8 @@ services:
       - "5050:80"
     depends_on:
       - postgres
+      - postgres_booking
+      - postgres_ticketing
+      - postgres_paying
     volumes:
       - ./src/server.json:/pgadmin/server.json

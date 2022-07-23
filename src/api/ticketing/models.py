@@ -4,14 +4,12 @@ from ticketing.domain import model
 
 class Ticket(models.Model):
     STATUSES = [
-        (model.TicketStatus.SUCCESS, model.TicketStatus.SUCCESS),
-        (model.TicketStatus.FAILED, model.TicketStatus.FAILED),
-        (model.TicketStatus.PENDING, model.TicketStatus.PENDING),
+        (k, k) for k, _ in model.TicketStatus.__dict__.items() if not k.startswith("_")
     ]
     ticket_id = models.UUIDField(primary_key=True)
     reservation_id = models.UUIDField(null=False)
-    status = models.CharField(null=False, choices=STATUSES)
-    details = models.JSONField(default={}, null=False)
+    status = models.CharField(null=False, choices=STATUSES, max_length=255)
+    details = models.JSONField(default=dict, null=False)
     ticket_url = models.TextField(null=True)
 
     def to_domain(self) -> model.Ticket:

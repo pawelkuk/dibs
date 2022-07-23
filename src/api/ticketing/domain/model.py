@@ -10,7 +10,6 @@ class TicketRenderError(Exception):
 class TicketStatus(Enum):
     SUCCESS = "success"
     FAILED = "failed"
-    PENDING = "pending"
 
 
 class Ticket:
@@ -30,7 +29,7 @@ class Ticket:
 
     def render(self) -> str:
         if self.ticket_url and self.status == TicketStatus.SUCCESS:
-            return
+            return self.ticket_url
         elif not self.ticket_id or not self.reservation_id or not self.details:
             raise TicketRenderError("Insufficient information to render ticket!")
         elif random.random() < 0.99:
