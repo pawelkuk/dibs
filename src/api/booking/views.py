@@ -19,7 +19,7 @@ def make_reservation(request):
         )
     except model.SeatsCollide as e:
         return JsonResponse({"message": str(e)}, status=400)
-    return JsonResponse({"success": "True"}, status=201)
+    return JsonResponse({"success": True}, status=201)
 
 
 @csrf_exempt
@@ -34,4 +34,4 @@ def cancel_reservation(request):
     except model.ReservationDoesNotExists as e:
         return JsonResponse({"message": str(e)}, status=404)
 
-    return JsonResponse({"success": "True"}, status=204)
+    return JsonResponse({"success": True}, status=204)

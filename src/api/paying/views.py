@@ -18,4 +18,4 @@ def pay(request):
         )
     except model.PaymentError as e:
         return JsonResponse({"message": str(e)}, status=400)
-    return JsonResponse({"success": "True", "payment_id": payment_id}, status=201)
+    return JsonResponse({"success": True, "payment_id": payment_id}, status=201)

@@ -17,4 +17,4 @@ def render_ticket(request):
         )
     except model.TicketRenderError as e:
         return JsonResponse({"message": str(e)}, status=400)
-    return JsonResponse({"success": "True", "ticket_id": ticket_id}, status=201)
+    return JsonResponse({"success": True, "ticket_id": ticket_id}, status=201)
