@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import ujson as json
 from booking.domain import model
@@ -7,7 +7,7 @@ import uuid
 
 
 @csrf_exempt
-def make_reservation(request):
+def make_reservation(request: HttpRequest):
     data = json.loads(request.body)
     try:
         services.make_reservation(
@@ -23,7 +23,7 @@ def make_reservation(request):
 
 
 @csrf_exempt
-def cancel_reservation(request):
+def cancel_reservation(request: HttpRequest):
     data = json.loads(request.body)
     try:
         services.cancel_reservation(

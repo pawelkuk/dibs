@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import ujson as json
 from paying.domain import model
@@ -7,7 +7,7 @@ import uuid
 
 
 @csrf_exempt
-def pay(request):
+def pay(request: HttpRequest):
     data = json.loads(request.body)
     try:
         payment_id = services.pay(
@@ -22,7 +22,7 @@ def pay(request):
 
 
 @csrf_exempt
-def refund(request):
+def refund(request: HttpRequest):
     data = json.loads(request.body)
     try:
         services.refund(

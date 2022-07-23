@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import ujson as json
 from ticketing.domain import model
@@ -7,7 +7,7 @@ import uuid
 
 
 @csrf_exempt
-def render_ticket(request):
+def render_ticket(request: HttpRequest):
     data = json.loads(request.body)
     try:
         ticket_id = services.render_ticket(
