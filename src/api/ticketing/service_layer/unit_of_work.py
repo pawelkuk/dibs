@@ -33,7 +33,7 @@ class DjangoUnitOfWork(AbstractUnitOfWork):
         transaction.set_autocommit(True)
 
     def commit(self):
-        for ticket in self.tickets:
+        for ticket in self.tickets.seen:
             self.tickets.update(ticket)
         transaction.commit()
 

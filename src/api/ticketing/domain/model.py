@@ -21,7 +21,7 @@ class Ticket:
         status: str = None,
         ticket_url: str = None,
     ) -> None:
-        self.ticket_id = ticket_id
+        self.ticket_id = ticket_id or uuid4()
         self.reservation_id = reservation_id
         self.status = status
         self.details = details

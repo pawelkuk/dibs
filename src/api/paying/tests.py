@@ -17,6 +17,4 @@ class PaymentTestCase(TransactionTestCase):
             },
             content_type="application/json",
         )
-        import bpdb
-
-        bpdb.set_trace()
+        self.assertEqual(res.status_code, 201)
