@@ -21,27 +21,24 @@ class PaymentStatus(Enum):
 class Payment:
     def __init__(
         self,
-        payment_id: UUID,
         user_id: UUID,
-        status: PaymentStatus,
         amount: str,
         currency: Currency,
+        status: PaymentStatus = None,
+        payment_id: UUID = None,
     ):
         self.payment_id = payment_id
         self.user_id = user_id
-        self.status = status.value
+        self.status = status
         self.amount = amount
-        self.currency = currency.value
+        self.currency = currency
 
-    def pay(self, user_id: UUID, amount: str, currency: Currency) -> UUID:
+    def pay(self) -> UUID:
         if self.status == PaymentStatus.SUCCESS and self.payment_id:
             return self.payment_id
 
-        if not user_id or not amount or not currency:
+        if not self.user_id or not self.amount or not self.currency:
             raise PaymentError("Insufficient informatation to process payment")
-        self.user_id = user_id
-        self.amount = amount
-        self.currency = currency
 
         self.payment_id = self.request_to_payment_provider()
         return self.payment_id

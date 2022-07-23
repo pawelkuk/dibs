@@ -15,11 +15,11 @@ class TicketStatus(Enum):
 class Ticket:
     def __init__(
         self,
-        ticket_id: UUID,
         reservation_id: UUID,
-        status: str,
         details: dict,
-        ticket_url: str,
+        ticket_id: UUID = None,
+        status: str = None,
+        ticket_url: str = None,
     ) -> None:
         self.ticket_id = ticket_id
         self.reservation_id = reservation_id

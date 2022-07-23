@@ -15,8 +15,12 @@ Including another URLconf
 """
 from django.urls import path
 from booking.views import make_reservation, cancel_reservation
+from ticketing.views import render_ticket
+from paying.views import pay
 
 urlpatterns = [
     path("make-reservation", view=make_reservation),
     path("cancel-reservation", view=cancel_reservation),
+    path("render-ticket", view=render_ticket),
+    path("pay", view=pay),
 ]
