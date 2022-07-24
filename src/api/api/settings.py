@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "api",
     "booking",
     "paying",
     "ticketing",
@@ -129,6 +130,8 @@ DATABASE_ROUTERS = [
     "paying.routers.PayingRouter",
     "api.routers.DefaultRouter",
 ]
+
+RABBITMQ_BROKER = "amqp://guest@rabbitmq:5672//"
 
 PAYMENT_SUCCESS_RATE = 0.9
 TICKET_RENDER_SUCCESS_RATE = 0.9

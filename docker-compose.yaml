@@ -68,3 +68,25 @@ services:
       - postgres_paying
     volumes:
       - ./src/server.json:/pgadmin/server.json
+
+  celery:
+    build: .
+    command: celery -A api worker -B -l info
+    environment:
+      - DB_HOST=postgres
+      - DB_PASSWORD=postgres
+      - API_HOST=app
+      - PYTHONDONTWRITEBYTECODE=1
+    depends_on:
+      - postgres
+    volumes:
+      - ./src/:/src/
+
+  rabbitmq:
+      image: rabbitmq
+      environment:
+          - RABBITMQ_DEFAULT_USER=guest
+          - RABBITMQ_DEFAULT_PASS=guest
+      ports:
+          - "5672:5672"
+          - "15672:15672"

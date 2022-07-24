@@ -9,3 +9,4 @@ django
 dj-database-url
 ujson
 bpython
+celery

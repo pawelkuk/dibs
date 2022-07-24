@@ -13,5 +13,5 @@
     - [x] paying
     - [x] ticketing
 - [ ] orchestrating service/choreogrphing
-- [ ] experiment service
+- [ ] experiment
 - [ ] distributed transactions approach

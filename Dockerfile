@@ -7,7 +7,7 @@ RUN mkdir -p /src
 COPY src/ /src/
 RUN pip install -e /src
 
-WORKDIR /src
+WORKDIR /src/api
 ENV DJANGO_SETTINGS_MODULE=api.settings
 CMD python /src/api/wait_for_postgres.py && \
     python /src/api/manage.py migrate && \
