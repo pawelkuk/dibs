@@ -34,18 +34,18 @@ class Payment:
         self.amount = amount
         self.currency = currency
 
-    def pay(self) -> UUID:
+    def pay(self, payment_success_rate: float) -> UUID:
         if self.status == PaymentStatus.SUCCESS and self.payment_id:
             return self.payment_id
 
         if not self.user_id or not self.amount or not self.currency:
             raise PaymentError("Insufficient informatation to process payment")
 
-        self.payment_id = self.request_to_payment_provider()
+        self.payment_id = self.request_to_payment_provider(payment_success_rate)
         return self.payment_id
 
-    def request_to_payment_provider(self):
-        if random() < 0.90:
+    def request_to_payment_provider(self, payment_success_rate: float):
+        if random() < payment_success_rate:
             # Happy path
             self.status = PaymentStatus.SUCCESS
             return uuid4()

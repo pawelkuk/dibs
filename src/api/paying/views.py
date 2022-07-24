@@ -4,6 +4,7 @@ import ujson as json
 from paying.domain import model
 from paying.service_layer import services, unit_of_work
 import uuid
+from django.conf import settings
 
 
 @csrf_exempt
@@ -15,6 +16,7 @@ def pay(request: HttpRequest):
             currency=model.Currency[data["currency"]],
             user_id=uuid.UUID(data["user_id"]),
             uow=unit_of_work.DjangoUnitOfWork(),
+            payment_success_rate=settings.PAYMENT_SUCCESS_RATE,
         )
     except model.PaymentError as e:
         return JsonResponse({"message": str(e)}, status=400)

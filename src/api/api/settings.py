@@ -129,3 +129,6 @@ DATABASE_ROUTERS = [
     "paying.routers.PayingRouter",
     "api.routers.DefaultRouter",
 ]
+
+PAYMENT_SUCCESS_RATE = 0.9
+TICKET_RENDER_SUCCESS_RATE = 0.9

@@ -8,10 +8,11 @@ def pay(
     amount: str,
     currency: model.Currency,
     uow: unit_of_work.AbstractUnitOfWork,
+    payment_success_rate: float,
 ):
     with uow:
         payment = model.Payment(amount=amount, currency=currency, user_id=user_id)
-        payment_id = payment.pay()
+        payment_id = payment.pay(payment_success_rate)
         uow.payments.add(payment=payment)
         uow.commit()
     return payment_id
