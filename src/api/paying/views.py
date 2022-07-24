@@ -26,7 +26,7 @@ def refund(request: HttpRequest):
     data = json.loads(request.body)
     try:
         services.refund(
-            amount=data["payment_id"],
+            payment_id=data["payment_id"],
             uow=unit_of_work.DjangoUnitOfWork(),
         )
     except model.PaymentError as e:

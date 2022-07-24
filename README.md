@@ -10,8 +10,8 @@
 - [ ] FE
 - [ ] integration tests
     - [ ] booking
-    - [ ] paying
-    - [ ] ticketing
+    - [x] paying
+    - [x] ticketing
 - [ ] orchestrating service/choreogrphing
 - [ ] experiment service
 - [ ] distributed transactions approach
