@@ -83,7 +83,7 @@ services:
       - ./src/:/src/
 
   rabbitmq:
-      image: rabbitmq
+      image: rabbitmq:management
       environment:
           - RABBITMQ_DEFAULT_USER=guest
           - RABBITMQ_DEFAULT_PASS=guest

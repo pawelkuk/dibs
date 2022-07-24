@@ -13,5 +13,7 @@
     - [x] paying
     - [x] ticketing
 - [ ] orchestrating service/choreogrphing
+    - [x] setup rabbitmq + celery
+    - [ ] write controller (saga workflow) as celery task/multiple tasks
 - [ ] experiment
 - [ ] distributed transactions approach
