@@ -17,6 +17,7 @@ from django.urls import path
 from booking.views import make_reservation, cancel_reservation
 from ticketing.views import render_ticket
 from paying.views import pay, refund
+from api.views import dibs
 
 urlpatterns = [
     path("make-reservation", view=make_reservation),
@@ -24,4 +25,5 @@ urlpatterns = [
     path("render-ticket", view=render_ticket),
     path("pay", view=pay),
     path("refund", view=refund),
+    path("dibs", view=dibs)
 ]

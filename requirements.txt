@@ -10,3 +10,4 @@ dj-database-url
 ujson
 bpython
 celery
+watchdog

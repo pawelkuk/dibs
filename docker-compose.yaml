@@ -71,7 +71,7 @@ services:
 
   celery:
     build: .
-    command: celery -A api worker -B -l info
+    command: watchmedo auto-restart --directory=. --patterns=*.py --recursive -- celery -A api worker -B -l info
     environment:
       - DB_HOST=postgres
       - DB_PASSWORD=postgres
