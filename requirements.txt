@@ -11,3 +11,4 @@ ujson
 bpython
 celery
 watchdog
+requests

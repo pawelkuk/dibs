@@ -15,6 +15,10 @@ class ReservationDoesNotExists(Exception):
     pass
 
 
+class ScreeningDoesNotExists(Exception):
+    pass
+
+
 @dataclass(frozen=True)
 class Seat:
     row: str

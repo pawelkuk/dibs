@@ -17,7 +17,7 @@ def make_reservation(request: HttpRequest):
             seats_data=data["seats_data"],
             uow=unit_of_work.DjangoUnitOfWork(),
         )
-    except model.SeatsCollide as e:
+    except Exception as e:
         return JsonResponse({"message": str(e)}, status=400)
     return JsonResponse({"success": True}, status=201)
 
@@ -31,7 +31,7 @@ def cancel_reservation(request: HttpRequest):
             screening_id=uuid.UUID(data["screening_id"]),
             uow=unit_of_work.DjangoUnitOfWork(),
         )
-    except model.ReservationDoesNotExists as e:
-        return JsonResponse({"message": str(e)}, status=404)
+    except Exception as e:
+        return JsonResponse({"message": str(e)}, status=400)
 
     return JsonResponse({"success": True}, status=204)

@@ -13,8 +13,12 @@ def make_reservation(
 ):
     seats = [model.Seat(*seat) for seat in seats_data]
     with uow:
-        reservation = model.Reservation(seats, customer_id, reservation_number)
         screening: model.Screening = uow.screenings.get(screening_id=screening_id)
+        if not screening:
+            raise model.ScreeningDoesNotExists(
+                "You want to make a reservation for a non existin screening"
+            )
+        reservation = model.Reservation(seats, customer_id, reservation_number)
         screening.make(reservation=reservation)
         uow.commit()
 
@@ -26,5 +30,9 @@ def cancel_reservation(
 ):
     with uow:
         screening: model.Screening = uow.screenings.get(screening_id=screening_id)
+        if not screening:
+            raise model.ScreeningDoesNotExists(
+                "You try to cancel a reservation for a non existin screening"
+            )
         screening.cancel(reservation_number)
         uow.commit()
