@@ -26,7 +26,7 @@ class RequestStep(SagaStep):
         return self.make_request(self.endpoint, expected_input)
 
     def compensate(self, expected_input: dict[str, Any]):
-        return self.make_request(self.compensation_endpoint, expected_input)
+        return self.make_request(self.compensation_endpoint, expected_input)[0]
 
 
 class ReservationStep(RequestStep):

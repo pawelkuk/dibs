@@ -95,3 +95,4 @@ class TestSagaWorkflow(SimpleTestCase):
         success = self.s.do()
         self.assertFalse(success)
         self.assertEqual(TestStep.call_count, 5)
+        self.assertEqual(TestStep.data, {"passed": "through saga"})
