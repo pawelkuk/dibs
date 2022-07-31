@@ -41,7 +41,7 @@ class PaymentStep(RequestStep):
 
 class TicketingStep(RequestStep):
     endpoint = "render-ticket"
-    compensation_endpoint = None  # None is needed because it's the last step
+    compensation_endpoint = None  # it's the last step so it's not needed
 
 
 class Saga:
