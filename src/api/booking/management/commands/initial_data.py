@@ -68,10 +68,10 @@ class Command(BaseCommand):
                 continue
             payment = Payment(
                 user_id=reservation.customer_id,
-                payment_id = uuid4(),
-                status=PaymentStatus.SUCCESS.value
-                currency= random.choice(["USD", "PLN", "GBP"])
-                amount="9.99"
+                payment_id=uuid4(),
+                status=PaymentStatus.SUCCESS.value,
+                currency=random.choice(["USD", "PLN", "GBP"]),
+                amount="9.99",
             )
             payment.save()
             if random.random() < 0.5:
@@ -84,6 +84,5 @@ class Command(BaseCommand):
                 ticket_url=f"/dibs_tickets/some-s3-path/{uuid4()}.pdf",
             )
             ticket.save()
-
 
         self.stdout.write("Data created 🍏")
