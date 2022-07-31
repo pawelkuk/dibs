@@ -1,4 +1,5 @@
 from typing import Any, Iterable
+from unittest import result
 from celery import shared_task
 import requests
 
@@ -16,7 +17,10 @@ class RequestStep(SagaStep):
     compensation_endpoint = None
 
     def make_request(self, endpoint: str, expected_input: dict[str, Any]):
-        return requests.post(f"app:5000/{endpoint}", expected_input)
+        res = requests.post(f"app:5000/{endpoint}", expected_input)
+        data = res.json()
+        success = res.status_code != 400
+        return data, success
 
     def make(self, expected_input: dict[str, Any]):
         return self.make_request(self.endpoint, expected_input)
@@ -37,7 +41,7 @@ class PaymentStep(RequestStep):
 
 class TicketingStep(RequestStep):
     endpoint = "render-ticket"
-    compensation_endpoint = None
+    compensation_endpoint = None  # None is needed because it's the last step
 
 
 class Saga:
@@ -77,8 +81,7 @@ def dibs(init_input):
         ],
         init_input=init_input,
     )
-    if saga.do():
+    if success := saga.do():
         print("success")
     else:
-
         print("failed")
