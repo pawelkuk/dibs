@@ -5,7 +5,7 @@ import requests
 
 
 class SagaStep:
-    def make(self, expected_input: dict[str, Any]) -> dict[str, Any]:
+    def make(self, expected_input: dict[str, Any]) -> tuple[dict[str, Any], bool]:
         raise NotImplementedError
 
     def compensate(self, expected_input: dict[str, Any]) -> dict[str, Any]:
