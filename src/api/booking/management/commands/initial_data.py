@@ -1,7 +1,14 @@
+from decimal import Decimal
+from locale import currency
+from secrets import choice
 from uuid import uuid4
 from django.core.management.base import BaseCommand
+from api.paying.domain.model import PaymentStatus
+from api.ticketing.domain.model import TicketStatus
 from booking.domain import model
 from booking import models
+from paying.models import Payment
+from ticketing.models import Ticket
 from itertools import product, islice
 import random
 
@@ -57,4 +64,26 @@ class Command(BaseCommand):
             reservation.screening = screening
             reservation.customer_id = uuid4()
             reservation.save()
+            if random.random() < 0.5:
+                continue
+            payment = Payment(
+                user_id=reservation.customer_id,
+                payment_id = uuid4(),
+                status=PaymentStatus.SUCCESS.value
+                currency= random.choice(["USD", "PLN", "GBP"])
+                amount="9.99"
+            )
+            payment.save()
+            if random.random() < 0.5:
+                continue
+
+            ticket = Ticket(
+                ticket_id=uuid4(),
+                reservation_id=reservation.reservation_number,
+                status=TicketStatus.SUCCESS.value,
+                ticket_url=f"/dibs_tickets/some-s3-path/{uuid4()}.pdf",
+            )
+            ticket.save()
+
+
         self.stdout.write("Data created 🍏")

@@ -5,7 +5,7 @@
 - [x] implement db per app
 - [x] paying service
 - [x] ticketing service
-- [ ] scripts for initial data
+- [x] scripts for initial data
 - [ ] read model service
 - [ ] FE
 - [ ] integration tests
