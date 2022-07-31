@@ -12,9 +12,9 @@
     - [ ] booking
     - [x] paying
     - [x] ticketing
-- [ ] orchestrating service/choreogrphing
+- [x] orchestrating service/choreogrphing
     - [x] setup rabbitmq + celery
     - [x] setup autoreload for celery
-    - [ ] write controller (saga workflow) as celery task/multiple tasks
+    - [x] write controller (saga workflow) as celery task/multiple tasks
 - [ ] experiment
 - [ ] distributed transactions approach
