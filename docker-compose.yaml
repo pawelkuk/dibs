@@ -90,3 +90,13 @@ services:
       ports:
           - "5672:5672"
           - "15672:15672"
+
+  frontend:
+    build: ./frontend                                                                                                 
+    command: sleep 9999 # npm run start                                                                                                
+    ports:                                                                                                            
+      - 3000:3000                                                                                                     
+    environment:
+      - CI=true
+    volumes:
+      - ./frontend:/frontend
