@@ -93,7 +93,7 @@ services:
 
   frontend:
     build: ./frontend                                                                                                 
-    command: sleep 9999 # npm run start                                                                                                
+    command: npm start
     ports:                                                                                                            
       - 3000:3000                                                                                                     
     environment:
