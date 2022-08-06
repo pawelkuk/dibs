@@ -1,21 +1,16 @@
 import "./App.css";
 import React, { useState } from "react";
 
+const getSeats = () => {
+  const row = [...Array(25).keys()].map((el) => el + 1);
+  const alpha = Array.from(Array(26)).map((e, i) => i + 65);
+  const alphabet = alpha.map((x) => String.fromCharCode(x));
+  const seats = alphabet.map((char) => row.map((num) => char + num.toString()));
+  return seats.flat();
+};
+
 function App(props) {
-  const seats = [
-    "a1",
-    "a2",
-    "a3",
-    "b1",
-    "b2",
-    "b3",
-    "c1",
-    "c2",
-    "c3",
-    "d1",
-    "d2",
-    "d3",
-  ];
+  const seats = getSeats();
   const [seatsAvailable, setSeatsAvailable] = useState([...seats]);
   const [seatsReserved, setSeatsReserved] = useState([]);
 
