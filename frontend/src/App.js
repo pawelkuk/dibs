@@ -12,26 +12,30 @@ const getSeats = () => {
 function App(props) {
   const seats = getSeats();
   const [seatsAvailable, setSeatsAvailable] = useState([...seats]);
+  const [seatsSelected, setSeatsSelected] = useState([]);
   const [seatsReserved, setSeatsReserved] = useState([]);
 
   function onClickData(seat) {
-    if (seatsReserved.indexOf(seat) > -1) {
+    if (seatsSelected.indexOf(seat) > -1) {
       setSeatsAvailable(seatsAvailable.concat(seat));
-      setSeatsReserved(seatsReserved.filter((res) => res !== seat));
+      setSeatsSelected(seatsSelected.filter((res) => res !== seat));
     } else {
-      setSeatsReserved(seatsReserved.concat(seat));
+      setSeatsSelected(seatsSelected.concat(seat));
       setSeatsAvailable(seatsAvailable.filter((res) => res !== seat));
     }
   }
-
+  function onClickReservation(seats) {
+    console.log(seats);
+  }
   return (
     <div>
       <h1>Dibs - Seat Reservation System</h1>
       <DrawGrid
         seat={seats}
         available={seatsAvailable}
-        reserved={seatsReserved}
+        selected={seatsSelected}
         onClickData={(seat) => onClickData(seat)}
+        onClickReservation={onClickReservation}
       />
     </div>
   );
@@ -49,7 +53,7 @@ function DrawGrid(props) {
             {props.seat.map((row) => (
               <td
                 className={
-                  props.reserved.indexOf(row) > -1 ? "reserved" : "available"
+                  props.selected.indexOf(row) > -1 ? "selected" : "available"
                 }
                 key={row}
                 onClick={(e) => onClickSeat(row)}
@@ -61,12 +65,23 @@ function DrawGrid(props) {
         </tbody>
       </table>
 
+      <SelectedList selected={props.selected} />
+      <MakeReservation
+        selected={props.selected}
+        onClickReservation={props.onClickReservation}
+      />
       <AvailableList available={props.available} />
-      <ReservedList reserved={props.reserved} />
     </div>
   );
 }
 
+function MakeReservation(props) {
+  return (
+    <button onClick={(e) => props.onClickReservation(props.selected)}>
+      Dibs!
+    </button>
+  );
+}
 function AvailableList(props) {
   const seatCount = props.available.length;
   return (
@@ -83,12 +98,12 @@ function AvailableList(props) {
   );
 }
 
-function ReservedList(props) {
+function SelectedList(props) {
   return (
     <div className="right">
-      <h4>Reserved Seats: ({props.reserved.length})</h4>
+      <h4>Selected Seats: ({props.selected.length})</h4>
       <ul>
-        {props.reserved.map((res) => (
+        {props.selected.map((res) => (
           <li key={res}>{res}</li>
         ))}
       </ul>

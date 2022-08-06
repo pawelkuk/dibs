@@ -22,10 +22,17 @@ h1 {
   cursor: pointer;
 }
 
-.reserved {
+.selected {
   background: orange;
   color: #fff;
   display: inline-block;
+}
+
+.reserved {
+  background: gainsboro;
+  /* color: #fff; */
+  display: inline-block;
+  border: 2px solid gray;
 }
 
 .available {
