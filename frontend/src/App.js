@@ -26,7 +26,7 @@ function App(props) {
 
   return (
     <div>
-      <h1>Seat Reservation System</h1>
+      <h1>Dibs - Seat Reservation System</h1>
       <DrawGrid
         seat={seats}
         available={seatsAvailable}
@@ -54,7 +54,7 @@ function DrawGrid(props) {
                 key={row}
                 onClick={(e) => onClickSeat(row)}
               >
-                {row}{" "}
+                {row}
               </td>
             ))}
           </tr>
