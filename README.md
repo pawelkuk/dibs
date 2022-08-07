@@ -12,7 +12,7 @@
 - [ ] FE
     - [ ] room component
     - [ ] post request
-    - [ ] seat picker
+    - [x] seat picker
     - [ ] update room after read service update 
 - [ ] integration tests
     - [ ] booking

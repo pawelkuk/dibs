@@ -45,7 +45,7 @@ services:
     ports:
       - "5433:5432"
   
-  postgres_paying :
+  postgres_paying:
     image: postgres
     environment:
       - POSTGRES_USER=postgres
@@ -92,11 +92,20 @@ services:
           - "15672:15672"
 
   frontend:
-    build: ./frontend                                                                                                 
+    build: ./frontend
     command: npm start
-    ports:                                                                                                            
+    ports:
       - 3000:3000                                                                                                     
     environment:
       - CI=true
     volumes:
       - ./frontend:/frontend
+  read_model:
+    build: ./read-model
+    command: node server.js
+    ports:
+      - 3001:3001
+    volumes:
+      - ./read-model:/read-model
+    depends_on:
+      - app
