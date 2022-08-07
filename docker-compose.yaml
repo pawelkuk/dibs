@@ -102,9 +102,10 @@ services:
       - ./frontend:/frontend
   read_model:
     build: ./read-model
-    command: node server.js
+    command: nodemon --inspect server.js
     ports:
       - 3001:3001
+      - 9229:9229
     volumes:
       - ./read-model:/read-model
     depends_on:
