@@ -1,5 +1,8 @@
 import "./App.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import io from "socket.io-client";
+
+const socket = io.connect(":3001");
 
 const getSeats = () => {
   const row = [...Array(25).keys()].map((el) => el + 1);
@@ -14,6 +17,23 @@ function App(props) {
   const [seatsAvailable, setSeatsAvailable] = useState([...seats]);
   const [seatsSelected, setSeatsSelected] = useState([]);
   const [seatsReserved, setSeatsReserved] = useState([]);
+  const [isConnected, setIsConnected] = useState(socket.connected);
+
+  useEffect(() => {
+    socket.on("connect", () => {
+      setIsConnected(true);
+    });
+
+    socket.on("disconnect", () => {
+      setIsConnected(false);
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.off("pong");
+    };
+  }, []);
 
   function onClickData(seat) {
     if (seatsReserved.indexOf(seat) > -1) return;
@@ -31,15 +51,20 @@ function App(props) {
   }
   return (
     <div>
-      <h1>Dibs - Seat Reservation System</h1>
-      <DrawGrid
-        seat={seats}
-        available={seatsAvailable}
-        selected={seatsSelected}
-        reserved={seatsReserved}
-        onClickData={(seat) => onClickData(seat)}
-        onClickReservation={onClickReservation}
-      />
+      <div>
+        <p>Connected: {"" + isConnected}</p>
+      </div>
+      <div>
+        <h1>Dibs - Seat Reservation System</h1>
+        <DrawGrid
+          seat={seats}
+          available={seatsAvailable}
+          selected={seatsSelected}
+          reserved={seatsReserved}
+          onClickData={(seat) => onClickData(seat)}
+          onClickReservation={onClickReservation}
+        />
+      </div>
     </div>
   );
 }
