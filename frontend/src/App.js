@@ -16,6 +16,7 @@ function App(props) {
   const [seatsReserved, setSeatsReserved] = useState([]);
 
   function onClickData(seat) {
+    if (seatsReserved.indexOf(seat) > -1) return;
     if (seatsSelected.indexOf(seat) > -1) {
       setSeatsAvailable(seatsAvailable.concat(seat));
       setSeatsSelected(seatsSelected.filter((res) => res !== seat));
@@ -25,7 +26,8 @@ function App(props) {
     }
   }
   function onClickReservation(seats) {
-    console.log(seats);
+    setSeatsReserved(seatsReserved.concat(seats));
+    setSeatsSelected([]);
   }
   return (
     <div>
@@ -34,6 +36,7 @@ function App(props) {
         seat={seats}
         available={seatsAvailable}
         selected={seatsSelected}
+        reserved={seatsReserved}
         onClickData={(seat) => onClickData(seat)}
         onClickReservation={onClickReservation}
       />
@@ -45,6 +48,11 @@ function DrawGrid(props) {
   function onClickSeat(seat) {
     props.onClickData(seat);
   }
+  function getSeatType(seat) {
+    if (props.reserved.indexOf(seat) > -1) return "reserved";
+    if (props.selected.indexOf(seat) > -1) return "selected";
+    return "available";
+  }
   return (
     <div className="container">
       <table className="grid">
@@ -52,9 +60,7 @@ function DrawGrid(props) {
           <tr>
             {props.seat.map((row) => (
               <td
-                className={
-                  props.selected.indexOf(row) > -1 ? "selected" : "available"
-                }
+                className={getSeatType(row)}
                 key={row}
                 onClick={(e) => onClickSeat(row)}
               >
