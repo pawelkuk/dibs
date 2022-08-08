@@ -1,9 +1,11 @@
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import ujson as json
-from booking.domain import model
 from booking.service_layer import services, unit_of_work
 import uuid
+from rest_framework import viewsets
+from booking.serializers import ScreeningModelSerializer
+from booking import models
 
 
 @csrf_exempt
@@ -35,3 +37,8 @@ def cancel_reservation(request: HttpRequest):
         return JsonResponse({"message": str(e)}, status=400)
 
     return JsonResponse({"success": True}, status=204)
+
+
+class ScreeningViewSet(viewsets.ModelViewSet):
+    serializer_class = ScreeningModelSerializer
+    queryset = models.Screening.objects.all()

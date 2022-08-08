@@ -2,6 +2,7 @@ from typing import Iterable
 from booking.service_layer import unit_of_work
 from uuid import UUID
 from booking.domain import model
+from booking import models
 
 
 def make_reservation(
@@ -16,7 +17,7 @@ def make_reservation(
         screening: model.Screening = uow.screenings.get(screening_id=screening_id)
         if not screening:
             raise model.ScreeningDoesNotExists(
-                "You want to make a reservation for a non existin screening"
+                "You want to make a reservation for a non existing screening"
             )
         reservation = model.Reservation(seats, customer_id, reservation_number)
         screening.make(reservation=reservation)
@@ -32,7 +33,17 @@ def cancel_reservation(
         screening: model.Screening = uow.screenings.get(screening_id=screening_id)
         if not screening:
             raise model.ScreeningDoesNotExists(
-                "You try to cancel a reservation for a non existin screening"
+                "You try to cancel a reservation for a non existing screening"
             )
         screening.cancel(reservation_number)
         uow.commit()
+
+
+def get_screening_state(
+    screening_id: UUID,
+    uow: unit_of_work.AbstractUnitOfWork,
+):
+    with uow:
+        screening: models.Screening = models.Screening.objects.get(
+            screening_id=screening_id
+        )

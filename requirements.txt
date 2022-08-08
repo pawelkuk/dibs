@@ -12,3 +12,4 @@ bpython
 celery
 watchdog
 requests
+djangorestframework

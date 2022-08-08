@@ -14,10 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-from booking.views import make_reservation, cancel_reservation
+from booking.views import make_reservation, cancel_reservation, ScreeningViewSet
 from ticketing.views import render_ticket
 from paying.views import pay, refund
 from api.views import dibs
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r"screenings", ScreeningViewSet, basename="screening")
 
 urlpatterns = [
     path("make-reservation", view=make_reservation),
@@ -25,5 +29,5 @@ urlpatterns = [
     path("render-ticket", view=render_ticket),
     path("pay", view=pay),
     path("refund", view=refund),
-    path("dibs", view=dibs)
-]
+    path("dibs", view=dibs),
+] + router.urls

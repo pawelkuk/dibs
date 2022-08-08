@@ -1,15 +1,11 @@
-from decimal import Decimal
-from locale import currency
-from secrets import choice
 from uuid import uuid4
 from django.core.management.base import BaseCommand
-from api.paying.domain.model import PaymentStatus
-from api.ticketing.domain.model import TicketStatus
-from booking.domain import model
+from paying.domain.model import PaymentStatus
+from ticketing.domain.model import TicketStatus
 from booking import models
 from paying.models import Payment
 from ticketing.models import Ticket
-from itertools import product, islice
+from itertools import product
 import random
 
 
