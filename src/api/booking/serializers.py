@@ -42,5 +42,3 @@ class ScreeningSerializer(serializers.ModelSerializer):
             "movie",
             "reservations",
         ]
-
-        depth = 1
