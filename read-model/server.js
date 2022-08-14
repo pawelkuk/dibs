@@ -55,6 +55,7 @@ app.post("/update", (req, res) => {
 });
 io.on("connection", (socket) => {
   console.log("a user connected");
+  socket.emit("state-change", state);
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });

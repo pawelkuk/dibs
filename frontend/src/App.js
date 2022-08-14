@@ -6,7 +6,7 @@ const socket = io.connect(":3001");
 
 const getSeats = () => {
   const row = [...Array(25).keys()].map((el) => el + 1);
-  const alpha = Array.from(Array(26)).map((e, i) => i + 65);
+  const alpha = Array.from(Array(26)).map((e, i) => i + 97);
   const alphabet = alpha.map((x) => String.fromCharCode(x));
   const seats = alphabet.map((char) => row.map((num) => char + num.toString()));
   return seats.flat();
@@ -25,7 +25,9 @@ function App(props) {
     });
 
     socket.on("state-change", (state) => {
-      console.log(state);
+      const sr = [];
+      state.reservations.map((res) => sr.push(...res.seats));
+      setSeatsReserved(sr);
     });
     socket.on("disconnect", () => {
       setIsConnected(false);
