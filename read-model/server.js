@@ -1,12 +1,13 @@
 const express = require("express");
 const app = express();
 const http = require("http");
-const axios = require('axios');
-
+const axios = require("axios");
+const EventEmitter = require("events").EventEmitter;
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 global.state = {};
 const bodyParser = require("body-parser");
+const emitter = new EventEmitter();
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -16,16 +17,20 @@ function sleep(ms) {
 
 getState = async (backoff) => {
   try {
-    const response = await axios.get('http://app:80/screenings/76388a51-1fa6-428f-839f-32a1e5091aab/')
-    state = response.data
+    const response = await axios.get(
+      "http://app:80/screenings/76388a51-1fa6-428f-839f-32a1e5091aab/"
+    );
+    state = response.data;
+    console.log("state ready");
+    emitter.emit("state-change");
   } catch (error) {
     console.log(error);
-    await sleep(backoff)
-    await getState(2*backoff)
+    await sleep(backoff);
+    await getState(2 * backoff);
   }
 };
 
-getState(1000)
+getState(1000);
 
 app.use(bodyParser.json());
 app.use(
@@ -45,13 +50,18 @@ app.get("/", (req, res) => {
 });
 
 app.post("/update", (req, res) => {
-  console.log(state);
+  emitter.emit("state-change");
+  return res.send({ status: "ok" });
 });
 io.on("connection", (socket) => {
   console.log("a user connected");
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });
+});
+emitter.on("state-change", () => {
+  console.log("update front");
+  io.sockets.emit("state-change", state);
 });
 
 server.listen(3001, () => {

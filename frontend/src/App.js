@@ -24,6 +24,9 @@ function App(props) {
       setIsConnected(true);
     });
 
+    socket.on("state-change", (state) => {
+      console.log(state);
+    });
     socket.on("disconnect", () => {
       setIsConnected(false);
     });
