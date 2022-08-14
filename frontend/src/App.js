@@ -28,6 +28,11 @@ function App(props) {
       const sr = [];
       state.reservations.map((res) => sr.push(...res.seats));
       setSeatsReserved(sr);
+      setSeatsAvailable(
+        seatsAvailable.filter((seat) => {
+          return sr.findIndex((s) => s === seat) === -1;
+        })
+      );
     });
     socket.on("disconnect", () => {
       setIsConnected(false);
@@ -36,7 +41,7 @@ function App(props) {
     return () => {
       socket.off("connect");
       socket.off("disconnect");
-      socket.off("pong");
+      socket.off("state-change");
     };
   }, []);
 
