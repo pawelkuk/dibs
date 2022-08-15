@@ -12,12 +12,12 @@ def make_reservation(
     seats_data: Iterable[tuple[str, int]],
     uow: unit_of_work.AbstractUnitOfWork,
 ):
-    seats = [model.Seat(*seat) for seat in seats_data]
+    seats = [model.Seat(row=seat[0], place=int(seat[1])) for seat in seats_data]
     with uow:
         screening: model.Screening = uow.screenings.get(screening_id=screening_id)
         if not screening:
             raise model.ScreeningDoesNotExists(
-                "You want to make a reservation for a non existing screening"
+                "You want to make a reservation for a non-existing screening"
             )
         reservation = model.Reservation(seats, customer_id, reservation_number)
         screening.make(reservation=reservation)

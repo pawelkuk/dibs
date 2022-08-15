@@ -16,8 +16,8 @@ class Command(BaseCommand):
         ...
 
     def handle(self, *args, **options):
-        rows = range(1, 11)
-        places = (chr(ord("a") + i) for i in range(20))
+        places = range(1, 26)
+        rows = (chr(ord("a") + i) for i in range(25))
         theatre_seats = [[row, place] for row, place in product(rows, places)]
         theatre = models.Theatre(seats=theatre_seats)
         theatre.save()

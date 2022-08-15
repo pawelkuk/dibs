@@ -26,7 +26,7 @@ class Theatre(models.Model):
     )
 
     def to_domain(self) -> model.Theatre:
-        seats = (model.Seat(row=seat[0], place=seat[1]) for seat in self.seats)
+        seats = (model.Seat(row=seat[0], place=int(seat[1])) for seat in self.seats)
         return model.Theatre(self.theatre_id, seats)
 
     @staticmethod
@@ -78,7 +78,7 @@ class Reservation(models.Model):
     customer_id = models.UUIDField(null=False)
 
     def to_domain(self) -> model.Reservation:
-        seats = (model.Seat(row=s[0], place=s[1]) for s in self.seats)
+        seats = (model.Seat(row=s[0], place=int(s[1])) for s in self.seats)
         return model.Reservation(seats, self.customer_id, self.reservation_number)
 
     @staticmethod

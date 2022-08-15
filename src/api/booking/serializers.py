@@ -14,7 +14,7 @@ class ReservationSerializer(serializers.ModelSerializer):
         ]
 
     def get_seats(self, obj):
-        return ["".join(x[::-1]) for x in obj.seats]
+        return ["".join(x) for x in obj.seats]
 
 
 class MovieSerializer(serializers.ModelSerializer):

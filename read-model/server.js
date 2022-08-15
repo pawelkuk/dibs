@@ -18,7 +18,7 @@ function sleep(ms) {
 getState = async (backoff) => {
   try {
     const response = await axios.get(
-      "http://app:80/screenings/76388a51-1fa6-428f-839f-32a1e5091aab/"
+      "http://app:80/screenings/b2e64791-1db7-4665-a939-60892e7f58be/"
     );
     state = response.data;
     console.log("state ready");

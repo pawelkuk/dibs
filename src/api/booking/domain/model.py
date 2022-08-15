@@ -108,7 +108,7 @@ class Screening:
     def _seats_taken(self) -> set[Seat]:
         seats_taken: set[Seat] = set()
         for reservation in self._reservations:
-            seats_taken.union(reservation.seats)
+            seats_taken |= reservation.seats
         return seats_taken
 
     def __hash__(self) -> int:
