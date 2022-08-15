@@ -1,6 +1,8 @@
 import "./App.css";
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
+import axios from "axios";
+import { Routes, Route, Link } from "react-router-dom";
 
 const socket = io.connect(":3001");
 
@@ -12,7 +14,22 @@ const getSeats = () => {
   return seats.flat();
 };
 
-function App(props) {
+function ScreeningList(props) {
+  const [screeningList, setScreeningList] = useState([]);
+  axios
+    .get("http://localhost:5000/screenings/")
+    .then((response) => {
+      console.log(response);
+      const data = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
+  return <Link></Link>;
+}
+
+function ScreeningRoom(props) {
   const seats = getSeats();
   const [seatsAvailable, setSeatsAvailable] = useState([...seats]);
   const [seatsSelected, setSeatsSelected] = useState([]);
@@ -76,6 +93,15 @@ function App(props) {
         />
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<ScreeningList />} />
+      <Route path="screening" element={<ScreeningRoom />} />
+    </Routes>
   );
 }
 
