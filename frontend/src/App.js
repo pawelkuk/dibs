@@ -2,9 +2,7 @@ import "./App.css";
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import axios from "axios";
-import { Routes, Route, Link } from "react-router-dom";
-
-const socket = io.connect(":3001");
+import { Routes, Route, Link, useParams } from "react-router-dom";
 
 const getSeats = () => {
   const row = [...Array(25).keys()].map((el) => el + 1);
@@ -16,28 +14,40 @@ const getSeats = () => {
 
 function ScreeningList(props) {
   const [screeningList, setScreeningList] = useState([]);
-  axios
-    .get("http://localhost:5000/screenings/")
-    .then((response) => {
-      console.log(response);
-      const data = response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/screenings/")
+      .then((response) => {
+        const data = response.data;
+        setScreeningList(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
 
-  return <Link></Link>;
+  return (
+    <ul>
+      {screeningList.map((obj) => (
+        <li key={obj.screening_id}>
+          <Link to={`/screenings/${obj.screening_id}`}>{obj.movie}</Link>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 function ScreeningRoom(props) {
+  const socket = io.connect(":3001");
   const seats = getSeats();
   const [seatsAvailable, setSeatsAvailable] = useState([...seats]);
   const [seatsSelected, setSeatsSelected] = useState([]);
   const [seatsReserved, setSeatsReserved] = useState([]);
   const [isConnected, setIsConnected] = useState(socket.connected);
-
+  const { screeningId } = useParams();
   useEffect(() => {
     socket.on("connect", () => {
+      socket.emit("screening", screeningId);
       setIsConnected(true);
     });
 
@@ -96,11 +106,20 @@ function ScreeningRoom(props) {
   );
 }
 
+function NotFound() {
+  return (
+    <div style={{ padding: "1rem" }}>
+      <p>404 - not found</p>
+    </div>
+  );
+}
+
 function App() {
   return (
     <Routes>
       <Route path="/" element={<ScreeningList />} />
-      <Route path="screening" element={<ScreeningRoom />} />
+      <Route path="screenings/:screeningId" element={<ScreeningRoom />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

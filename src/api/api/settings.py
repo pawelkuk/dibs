@@ -131,7 +131,7 @@ DATABASE_ROUTERS = [
     "paying.routers.PayingRouter",
     "api.routers.DefaultRouter",
 ]
-
+ALLOWED_HOSTS = ["*"]
 RABBITMQ_BROKER = "amqp://guest@rabbitmq:5672//"
 
 PAYMENT_SUCCESS_RATE = 0.9

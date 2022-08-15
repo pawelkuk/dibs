@@ -39,7 +39,12 @@ class Command(BaseCommand):
             "It's a Wonderful Life",
             "Chinatown",
         ]
-        movies = [models.Movie.objects.create(title=title) for title in movie_titles]
+        if models.Movie.objects.exists():
+            movies = list(models.Movie.objects.all())
+        else:
+            movies = [
+                models.Movie.objects.create(title=title) for title in movie_titles
+            ]
 
         def seat_generator():
             taken_seats = random.sample(theatre_seats, len(theatre_seats) // 2)
