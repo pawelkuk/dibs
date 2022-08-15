@@ -4,7 +4,7 @@ import ujson as json
 from booking.service_layer import services, unit_of_work
 import uuid
 from rest_framework import viewsets
-from booking.serializers import ScreeningSerializer
+from booking.serializers import ScreeningListSerializer, ScreeningSerializer
 from booking import models
 
 
@@ -40,5 +40,9 @@ def cancel_reservation(request: HttpRequest):
 
 
 class ScreeningViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = ScreeningSerializer
     queryset = models.Screening.objects.all()
+
+    def get_serializer_class(self):
+        if self.action_map["get"] == "list":
+            return ScreeningListSerializer
+        return ScreeningSerializer

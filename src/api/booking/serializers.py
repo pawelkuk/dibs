@@ -42,3 +42,17 @@ class ScreeningSerializer(serializers.ModelSerializer):
             "movie",
             "reservations",
         ]
+
+
+class ScreeningListSerializer(serializers.ModelSerializer):
+    movie = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Screening
+        fields = [
+            "screening_id",
+            "movie",
+        ]
+
+    def get_movie(self, obj):
+        return obj.movie.title
