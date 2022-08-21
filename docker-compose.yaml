@@ -71,7 +71,7 @@ services:
 
   celery:
     build: .
-    command: watchmedo auto-restart --directory=. --patterns=*.py --recursive -- celery -A api worker -B -l debug -Q celery
+    command: watchmedo auto-restart --directory=. --patterns=*.py --recursive -- celery -A api worker -B -l info -Q celery
     environment:
       - DB_HOST=postgres
       - DB_PASSWORD=postgres
@@ -80,6 +80,7 @@ services:
       - C_FORCE_ROOT=1
     depends_on:
       - postgres
+      - rabbitmq
     volumes:
       - ./src/:/src/
 
