@@ -61,10 +61,10 @@ app.post("/update", (req, res) => {
     screeningId = req.body["screening_id"];
     state.set(screeningId, req.body);
     emitter.emit("state-change", screeningId);
-    return res.send({ status: "ok" });
   } catch (error) {
     return res.send({ error: error.message });
   }
+  return res.send({ status: "ok" });
 });
 io.on("connection", (socket) => {
   socket.on("screening", (screeningId) => {
