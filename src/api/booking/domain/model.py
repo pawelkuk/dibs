@@ -1,6 +1,7 @@
 from typing import Iterable
 from dataclasses import dataclass
 from uuid import UUID, uuid4
+from booking.domain import events
 
 
 class SeatTaken(Exception):
@@ -77,11 +78,13 @@ class Screening:
         self._reservations = set(reservations)
         self.theatre = theatre
         self.movie = movie
+        self.events: list[events.Event] = []
 
     def make(self, reservation: Reservation):
         if self._seats_collide(reservation):
             raise SeatsCollide("Some seats are already reserved")
         self._reservations.add(reservation)
+        self.events.append(events.ScreeningChanged(self.screening_id))
 
     def cancel(self, reservation_number: UUID):
         try:
@@ -93,6 +96,7 @@ class Screening:
         except StopIteration:
             raise ReservationDoesNotExists("Try an existing reservation")
         self._reservations.remove(reservation)
+        self.events.append(events.ScreeningChanged(self.screening_id))
 
     def _seats_collide(self, reservation: Reservation) -> bool:
         if reservation in self._reservations:

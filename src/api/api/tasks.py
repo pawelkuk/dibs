@@ -1,5 +1,4 @@
 from typing import Any, Iterable
-from unittest import result
 from celery import shared_task
 import requests
 

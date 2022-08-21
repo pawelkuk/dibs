@@ -1,7 +1,9 @@
 import abc
 from uuid import UUID
+
 from booking.domain import model
 from booking import models as django_models
+
 
 
 class AbstractRepository(abc.ABC):
@@ -36,3 +38,4 @@ class DjangoRepository(AbstractRepository):
 
     def list(self) -> list[model.Screening]:
         return [s.to_domain() for s in django_models.Screening.objects.all()]
+

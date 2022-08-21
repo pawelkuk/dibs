@@ -5,7 +5,7 @@ from booking import config
 
 
 def wait_for_postgres_to_come_up():
-    deadline = time.time() + 10
+    deadline = time.time() + 30
     while time.time() < deadline:
         try:
             return psycopg2.connect(config.get_postgres_uri("postgres"))
