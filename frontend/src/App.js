@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import axios from "axios";
 import { Routes, Route, Link, useParams } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
 const getSeats = () => {
   const row = [...Array(25).keys()].map((el) => el + 1);
@@ -83,7 +84,23 @@ function ScreeningRoom(props) {
     }
   }
   function onClickReservation(seats) {
-    setSeatsReserved(seatsReserved.concat(seats));
+    const digitsPattern = /[0-9]+/g;
+    const letterPattern = /[a-zA-Z]+/g;
+    const seatsData = seats.map((seat) => {
+      const row = seat.match(letterPattern)[0];
+      const column = seat.match(digitsPattern)[0];
+      return [row, Number(column)];
+    });
+    axios
+      .post("http://localhost:5000/make-reservation", {
+        customer_id: uuidv4(),
+        screening_id: screeningId,
+        reservation_number: uuidv4(),
+        seats_data: seatsData,
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
     setSeatsSelected([]);
   }
   return (

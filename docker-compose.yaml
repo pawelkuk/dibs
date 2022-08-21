@@ -26,6 +26,8 @@ services:
       - POSTGRES_DB=postgres
     ports:
       - "5432:5432"
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql
 
   postgres_booking:
     image: postgres
@@ -35,6 +37,8 @@ services:
       - POSTGRES_DB=postgres
     ports:
       - "5435:5432"
+    volumes:
+      - ./volumes/postgres_booking:/var/lib/postgresql
 
   postgres_ticketing:
     image: postgres
@@ -44,6 +48,8 @@ services:
       - POSTGRES_DB=postgres
     ports:
       - "5433:5432"
+    volumes:
+      - ./volumes/postgres_ticketing:/var/lib/postgresql
   
   postgres_paying:
     image: postgres
@@ -53,6 +59,8 @@ services:
       - POSTGRES_DB=postgres
     ports:
       - "5434:5432"
+    volumes:
+      - ./volumes/postgres_paying:/var/lib/postgresql
 
   pgadmin:
     image: dpage/pgadmin4
@@ -104,6 +112,7 @@ services:
       - CI=true
     volumes:
       - ./frontend:/frontend
+
   read_model:
     build: ./read-model
     command: nodemon --inspect server.js
