@@ -57,8 +57,14 @@ app.get("/", (req, res) => {
 });
 
 app.post("/update", (req, res) => {
-  emitter.emit("state-change", screeningId);
-  return res.send({ status: "ok" });
+  try {
+    screeningId = req.body["screening_id"];
+    state.set(screeningId, req.body);
+    emitter.emit("state-change", screeningId);
+    return res.send({ status: "ok" });
+  } catch (error) {
+    return res.send({ error: error.message });
+  }
 });
 io.on("connection", (socket) => {
   socket.on("screening", (screeningId) => {
