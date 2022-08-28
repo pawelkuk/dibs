@@ -4,6 +4,7 @@ import ujson as json
 from ticketing.domain import model
 from ticketing.service_layer import services, unit_of_work
 import uuid
+from django.conf import settings
 
 
 @csrf_exempt
@@ -14,6 +15,7 @@ def render_ticket(request: HttpRequest):
             details=data["details"],
             reservation_id=uuid.UUID(data["reservation_id"]),
             uow=unit_of_work.DjangoUnitOfWork(),
+            success_rate=settings.TICKET_RENDER_SUCCESS_RATE,
         )
     except model.TicketRenderError as e:
         return JsonResponse({"message": str(e)}, status=400)

@@ -21,9 +21,11 @@ class RequestStep(SagaStep):
         self.endpoint_kwargs = endpoint_kwargs
 
     def make_request(self, endpoint: str, expected_input: dict[str, Any]):
+        print(f"http://app/{endpoint}")
         res = requests.post(f"http://app/{endpoint}", json=expected_input)
-        self.compensation_kwargs = res.json()
-        success = res.status_code != 400
+        success = res.status_code < 400
+        if success:
+            self.compensation_kwargs = res.json()
         return self.compensation_kwargs, success
 
     def make(self, expected_input: dict[str, Any]):
@@ -61,7 +63,6 @@ class Saga:
 
         next_input = {}
         for idx, step in enumerate(self.steps):
-            print(step)
             result, success = step.make(next_input)
             next_input = result
             if success:
@@ -74,8 +75,6 @@ class Saga:
 
         # rollback succesful steps
         for step in reversed(self.steps[:failed_step]):
-            print(step)
-
             next_input = step.compensate(next_input)
 
         return False  # Try again later
@@ -83,9 +82,6 @@ class Saga:
 
 @shared_task
 def dibs(init_input):
-    import bpdb
-
-    bpdb.set_trace()
     reservation_kwargs = {
         "customer_id": init_input["customer_id"],
         "screening_id": init_input["screening_id"],

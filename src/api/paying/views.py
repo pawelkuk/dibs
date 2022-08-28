@@ -33,4 +33,4 @@ def refund(request: HttpRequest):
         )
     except model.PaymentError as e:
         return JsonResponse({"message": str(e)}, status=400)
-    return JsonResponse({"success": True}, status=204)
+    return JsonResponse({"success": True}, status=200)

@@ -21,7 +21,14 @@ def make_reservation(request: HttpRequest):
         )
     except Exception as e:
         return JsonResponse({"message": str(e)}, status=400)
-    return JsonResponse({"success": True}, status=201)
+    return JsonResponse(
+        {
+            "success": True,
+            "screening_id": data["screening_id"],
+            "reservation_number": data["reservation_number"],
+        },
+        status=201,
+    )
 
 
 @csrf_exempt
@@ -36,7 +43,7 @@ def cancel_reservation(request: HttpRequest):
     except Exception as e:
         return JsonResponse({"message": str(e)}, status=400)
 
-    return JsonResponse({"success": True}, status=204)
+    return JsonResponse({"success": True}, status=200)
 
 
 class ScreeningViewSet(viewsets.ReadOnlyModelViewSet):

@@ -7,10 +7,11 @@ def render_ticket(
     reservation_id: UUID,
     details: dict,
     uow: unit_of_work.AbstractUnitOfWork,
+    success_rate,
 ):
     with uow:
         ticket = model.Ticket(details=details, reservation_id=reservation_id)
-        ticket_id = ticket.render()
+        ticket_id = ticket.render(success_rate)
         uow.tickets.add(ticket=ticket)
         uow.commit()
     return ticket_id
