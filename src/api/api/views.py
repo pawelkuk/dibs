@@ -1,13 +1,15 @@
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from api.serializers import DibsSerializer
 import ujson as json
-from api.tasks import dibs
+from api import tasks
 
-@csrf_exempt    
+
+@csrf_exempt
 def dibs(request: HttpRequest):
     data: dict = json.loads(request.body)
-    try:
-        dibs.delay(**data)
-    except Exception as e:
-        return JsonResponse({"message": str(e)}, status=400)
+    dibs_serializer = DibsSerializer(data=data)
+    if not dibs_serializer.is_valid():
+        return JsonResponse({"errors": dibs_serializer.errors}, status=400)
+    tasks.dibs(dibs_serializer.validated_data)
     return JsonResponse({"success": True}, status=200)

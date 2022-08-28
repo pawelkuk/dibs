@@ -13,19 +13,28 @@ class SagaStep:
 
 class RequestStep(SagaStep):
     endpoint = None
+    endpoint_kwargs = None
     compensation_endpoint = None
+    compensation_kwargs = None
+
+    def __init__(self, **endpoint_kwargs):
+        self.endpoint_kwargs = endpoint_kwargs
 
     def make_request(self, endpoint: str, expected_input: dict[str, Any]):
-        res = requests.post(f"app:5000/{endpoint}", expected_input)
-        data = res.json()
+        res = requests.post(f"http://app/{endpoint}", json=expected_input)
+        self.compensation_kwargs = res.json()
         success = res.status_code != 400
-        return data, success
+        return self.compensation_kwargs, success
 
     def make(self, expected_input: dict[str, Any]):
-        return self.make_request(self.endpoint, expected_input)
+        return self.make_request(
+            self.endpoint, {**self.endpoint_kwargs, **expected_input}
+        )
 
     def compensate(self, expected_input: dict[str, Any]):
-        return self.make_request(self.compensation_endpoint, expected_input)[0]
+        return self.make_request(self.compensation_endpoint, self.compensation_kwargs)[
+            0
+        ]
 
 
 class ReservationStep(RequestStep):
@@ -44,15 +53,15 @@ class TicketingStep(RequestStep):
 
 
 class Saga:
-    def __init__(self, steps: Iterable[SagaStep], init_input: dict[str, Any]) -> None:
+    def __init__(self, steps: Iterable[SagaStep]) -> None:
         self.steps = steps
-        self.init_input = init_input
 
     def do(self) -> bool:
         failed_step = None
 
-        next_input = self.init_input
+        next_input = {}
         for idx, step in enumerate(self.steps):
+            print(step)
             result, success = step.make(next_input)
             next_input = result
             if success:
@@ -65,6 +74,8 @@ class Saga:
 
         # rollback succesful steps
         for step in reversed(self.steps[:failed_step]):
+            print(step)
+
             next_input = step.compensate(next_input)
 
         return False  # Try again later
@@ -72,13 +83,32 @@ class Saga:
 
 @shared_task
 def dibs(init_input):
+    import bpdb
+
+    bpdb.set_trace()
+    reservation_kwargs = {
+        "customer_id": init_input["customer_id"],
+        "screening_id": init_input["screening_id"],
+        "reservation_number": init_input["reservation_number"],
+        "seats_data": init_input["seats_data"],
+    }
+    payment_kwargs = {
+        "user_id": init_input["customer_id"],
+        "reservation_number": init_input["reservation_number"],
+        "amount": str(init_input["amount"]),
+        "currency": init_input["currency"],
+    }
+    ticket_kwargs = {
+        "reservation_id": init_input["reservation_number"],
+        "details": init_input["details"],
+    }
+
     saga = Saga(
         steps=[
-            ReservationStep(),
-            PaymentStep(),
-            TicketingStep(),
-        ],
-        init_input=init_input,
+            ReservationStep(**reservation_kwargs),
+            PaymentStep(**payment_kwargs),
+            TicketingStep(**ticket_kwargs),
+        ]
     )
     if success := saga.do():
         print("success")
