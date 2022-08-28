@@ -6,8 +6,8 @@
 - [x] paying service
 - [x] ticketing service
 - [x] scripts for initial data
-- [ ] read model service
-    - [ ] update read service during saga
+- [x] read model service
+    - [x] update read service during saga
     - [x] push updates to FE
 - [x] FE
     - [x] room component

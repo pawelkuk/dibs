@@ -36,8 +36,7 @@ class TestSagaWorkflow(SimpleTestCase):
                 ReservationTestStep(),
                 PaymentTestStep(),
                 TicketingTestStep(),
-            ],
-            {"passed": "through saga"},
+            ]
         )
         super().setUp()
 
