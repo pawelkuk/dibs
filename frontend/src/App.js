@@ -5,6 +5,7 @@ import axios from "axios";
 import { Routes, Route, Link, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
+const API = "http://localhost:5005";
 const getSeats = () => {
   const row = [...Array(25).keys()].map((el) => el + 1);
   const alpha = Array.from(Array(26)).map((e, i) => i + 97);
@@ -17,7 +18,7 @@ function ScreeningList(props) {
   const [screeningList, setScreeningList] = useState([]);
   useEffect(() => {
     axios
-      .get("http://localhost:5000/screenings/")
+      .get(`${API}/screenings/`)
       .then((response) => {
         const data = response.data;
         setScreeningList(data);
@@ -92,7 +93,7 @@ function ScreeningRoom(props) {
       return [row, Number(column)];
     });
     axios
-      .post("http://localhost:5000/make-reservation", {
+      .post(`${API}/make-reservation`, {
         customer_id: uuidv4(),
         screening_id: screeningId,
         reservation_number: uuidv4(),
@@ -109,7 +110,9 @@ function ScreeningRoom(props) {
         <p>Connected: {"" + isConnected}</p>
       </div>
       <div>
-        <h1>Dibs - Seat Reservation System</h1>
+        <h1>
+          <Link to={"/"}>Dibs - Seat Reservation System</Link>
+        </h1>
         <DrawGrid
           seat={seats}
           available={seatsAvailable}

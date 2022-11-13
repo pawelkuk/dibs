@@ -15,8 +15,9 @@ services:
     volumes:
       - ./src/:/src/
     ports:
-      - "5005:80"
-
+      - 5005:80
+    stdin_open: true
+    tty: true
 
   postgres:
     image: postgres
@@ -25,7 +26,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     ports:
-      - "5432:5432"
+      - 5432:5432
     volumes:
       - ./volumes/postgres:/var/lib/postgresql
 
@@ -36,7 +37,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     ports:
-      - "5435:5432"
+      - 5435:5432
     volumes:
       - ./volumes/postgres_booking:/var/lib/postgresql
 
@@ -47,10 +48,10 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     ports:
-      - "5433:5432"
+      - 5433:5432
     volumes:
       - ./volumes/postgres_ticketing:/var/lib/postgresql
-  
+
   postgres_paying:
     image: postgres
     environment:
@@ -58,7 +59,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     ports:
-      - "5434:5432"
+      - 5434:5432
     volumes:
       - ./volumes/postgres_paying:/var/lib/postgresql
 
@@ -68,7 +69,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: pass1234
     ports:
-      - "5050:80"
+      - 5050:80
     depends_on:
       - postgres
       - postgres_booking
@@ -98,10 +99,10 @@ services:
         - RABBITMQ_DEFAULT_USER=guest
         - RABBITMQ_DEFAULT_PASS=guest
       ports:
-        - "5672:5672"
-        - "15672:15672"
+        - 5672:5672
+        - 15672:15672
       volumes:
-        - './volumes/rabbitmq/:/var/lib/rabbitmq/mnesia/'
+        - ./volumes/rabbitmq/:/var/lib/rabbitmq/mnesia/
 
   frontend:
     build: ./frontend
