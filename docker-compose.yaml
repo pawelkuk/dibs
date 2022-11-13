@@ -16,7 +16,7 @@ services:
       - ./src/:/src/
     ports:
       - "5005:80"
-
+    stdin_open: true
 
   postgres:
     image: postgres
@@ -31,6 +31,7 @@ services:
 
   postgres_booking:
     image: postgres
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -39,6 +40,7 @@ services:
       - "5435:5432"
     volumes:
       - ./volumes/postgres_booking:/var/lib/postgresql
+      - ./resources/postgres.conf:/etc/postgresql/postgresql.conf
 
   postgres_ticketing:
     image: postgres
@@ -112,6 +114,7 @@ services:
       - CI=true
     volumes:
       - ./frontend:/frontend
+    stdin_open: true
 
   read_model:
     build: ./read-model
@@ -123,3 +126,133 @@ services:
       - ./read-model:/read-model
     depends_on:
       - app
+    stdin_open: true
+
+  zookeeper-1:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+
+  zookeeper-2:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 32181:2181
+  
+  kafka-1:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+  # kafka-2:
+  #   image: confluentinc/cp-kafka:latest
+  #   depends_on:
+  #     - zookeeper-1
+  #     - zookeeper-2
+  #   ports:
+  #     - 39092:39092
+  #   environment:
+  #     KAFKA_BROKER_ID: 2
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9092,PLAINTEXT_HOST://localhost:39092
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  #     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+  #     KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+  # kafka-3:
+  #   image: confluentinc/cp-kafka:latest
+  #   depends_on:
+  #     - zookeeper-1
+  #     - zookeeper-2
+  #   ports:
+  #     - 49092:49092
+  #   environment:
+  #     KAFKA_BROKER_ID: 3
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:9092,PLAINTEXT_HOST://localhost:49092
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  connect:
+    image: debezium/connect
+    depends_on:
+      - kafka-1
+      # - kafka-2
+    ports:
+      - 8083:8083
+    environment:
+      CONFIG_STORAGE_TOPIC: my-connect-configs
+      OFFSET_STORAGE_TOPIC: my-connect-offsets
+      BOOTSTRAP_SERVERS: kafka-1:9092 #,kafka-2:9092
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1  # sprawdzić czy działają te dwie zmienne
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+    
+  ksqldb:
+    image: confluentinc/ksqldb-server
+    depends_on:
+      - kafka-1
+      # - kafka-2
+    ports:
+      - 8088:8088
+    environment:
+      KSQL_LISTENERS: http://0.0.0.0:8088
+      KSQL_BOOTSTRAP_SERVERS: kafka-1:9092 #,kafka-2:9092
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
+  ksqldb-cli:
+    image: confluentinc/ksqldb-cli
+    depends_on:
+      - ksqldb
+    entrypoint: /bin/sh
+    tty: true
+    stdin_open: true
+  producer:
+    image: python
+    command: sh -c "pip install confluent-kafka 'watchdog[watchmedo]' && cd home && watchmedo auto-restart --directory=. --patterns=./app/*.py --recursive python /home/app/producer.py"
+    volumes:
+      - ./scripts:/home/app
+    tty: true
+    stdin_open: true
+    
+  consumer:
+    image: python
+    command: sh -c "pip install confluent-kafka 'watchdog[watchmedo]' && cd home && watchmedo auto-restart --directory=. --patterns=./app/*.py --recursive python /home/app/consumer.py"
+    volumes:
+      - ./scripts:/home/app
+    tty: true
+    stdin_open: true
+
+  schemaregistry:
+    image: confluentinc/cp-schema-registry
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - kafka-1
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka-1:9092  # ,kafka-2:9092
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: zookeeper-1:2181
+      SCHEMA_REGISTRY_HOST_NAME: schemaregistry
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8085
+      SCHEMA_REGISTRY_DEBUG: true
+    ports:
+      - 8085:8085
+      
