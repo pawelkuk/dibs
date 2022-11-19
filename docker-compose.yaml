@@ -14,9 +14,11 @@ services:
       - PYTHONDONTWRITEBYTECODE=1
     volumes:
       - ./src/:/src/
+      - ./volumes/app/my-site-packages:/my-site-packages
     ports:
       - 5005:80
     stdin_open: true
+    # command: sleep 9999
     tty: true
 
   postgres:

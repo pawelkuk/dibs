@@ -1,6 +1,8 @@
+import sys
+
+sys.path.insert(5, "/my-site-packages")
 import time
 import psycopg2
-
 from booking import config
 
 

@@ -57,6 +57,3 @@ def start_mappers():
         reservations,
         properties={"screening": relationship(screening_mapper)},
     )
-
-
-start_mappers()
