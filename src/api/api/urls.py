@@ -17,7 +17,7 @@ from django.urls import path
 from booking.views import make_reservation, cancel_reservation, ScreeningViewSet
 from ticketing.views import render_ticket
 from paying.views import pay, refund
-from api.views import dibs
+from api.views import dibs, dibs_two_phase_commit
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
@@ -30,4 +30,5 @@ urlpatterns = [
     path("pay", view=pay),
     path("refund", view=refund),
     path("dibs", view=dibs),
+    path("dibs-two-phase-commit", view=dibs_two_phase_commit),
 ] + router.urls

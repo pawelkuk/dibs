@@ -39,4 +39,8 @@ def dibs(
         ticket_id = ticket.render(ticketing_success_rate)
         uow.repo.add(ticket=ticket)
         uow.commit()
-    return payment_id, ticket_id, reservation_number
+    return {
+        "payment_id": payment_id,
+        "ticket_id": ticket_id,
+        "reservation_number": reservation_number,
+    }

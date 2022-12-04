@@ -5,6 +5,7 @@ import ujson as json
 from api import tasks
 from api.service_layer import services
 from django.conf import settings
+from api.service_layer import unit_of_work
 
 
 @csrf_exempt
@@ -25,11 +26,12 @@ def dibs_two_phase_commit(request: HttpRequest):
     if not dibs_serializer.is_valid():
         return JsonResponse({"errors": dibs_serializer.errors}, status=400)
     try:
-        services.dibs(
+        res = services.dibs(
             **dibs_serializer.validated_data,
             payment_success_rate=settings.PAYMENT_SUCCESS_RATE,
-            ticketing_success_rate=settings.TICKET_RENDER_SUCCESS_RATE
+            ticketing_success_rate=settings.TICKET_RENDER_SUCCESS_RATE,
+            uow=unit_of_work.SqlAlchemyUnitOfWork()
         )
     except Exception as e:
         return JsonResponse({"message": str(e)}, status=400)
-    return JsonResponse(..., status=200)
+    return JsonResponse({"success": True}, status=200)
