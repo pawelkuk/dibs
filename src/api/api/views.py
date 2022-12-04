@@ -20,7 +20,6 @@ def dibs(request: HttpRequest):
 
 @csrf_exempt
 def dibs_two_phase_commit(request: HttpRequest):
-
     data: dict = json.loads(request.body)
     dibs_serializer = DibsSerializer(data=data)
     if not dibs_serializer.is_valid():
