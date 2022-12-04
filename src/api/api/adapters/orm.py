@@ -6,22 +6,22 @@ from paying.adapters import orm as paying_orm
 from ticketing.adapters import orm as ticketing_orm
 
 
-def default_session_factory():
+def default_session_factory(isolation_level):
     paying_engine = create_engine(
         config.get_postgres_uri("postgres_paying"),
-        isolation_level=config.SQL_ALCHEMY_ISOLATION_LEVEL,
+        isolation_level=isolation_level,
         future=True,
         echo=True,
     )
     ticketing_engine = create_engine(
         config.get_postgres_uri("postgres_ticketing"),
-        isolation_level=config.SQL_ALCHEMY_ISOLATION_LEVEL,
+        isolation_level=isolation_level,
         future=True,
         echo=True,
     )
     booking_engine = create_engine(
         config.get_postgres_uri("postgres_booking"),
-        isolation_level=config.SQL_ALCHEMY_ISOLATION_LEVEL,
+        isolation_level=isolation_level,
         future=True,
         echo=True,
     )

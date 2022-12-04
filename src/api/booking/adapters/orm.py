@@ -30,7 +30,7 @@ reservations = Table(
     ),
     Column("screening_id", ForeignKey("booking_screening.screening_id")),
     Column("customer_id", UUID(as_uuid=True), nullable=False),
-    Column("seats", ARRAY(String, dimensions=2)),
+    Column("seats", ARRAY(String, dimensions=2), key="seats1"),
 )
 
 theatres = Table(
@@ -44,16 +44,19 @@ theatres = Table(
 def start_mappers():
     movies_mapper = mapper_registry.map_imperatively(model.Movie, movies)
     theatres_mapper = mapper_registry.map_imperatively(model.Theatre, theatres)
-    screening_mapper = mapper_registry.map_imperatively(
+    reservations_mapper = mapper_registry.map_imperatively(
+        model.Reservation, reservations
+    )
+    mapper_registry.map_imperatively(
         model.Screening,
         screenings,
         properties={
             "movie": relationship(movies_mapper),
             "theatre": relationship(theatres_mapper),
+            "_reservations": relationship(
+                reservations_mapper,
+                collection_class=set,
+            ),
+            "_seats": ...,
         },
-    )
-    mapper_registry.map_imperatively(
-        model.Reservation,
-        reservations,
-        properties={"screening": relationship(screening_mapper)},
     )

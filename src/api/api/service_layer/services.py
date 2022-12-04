@@ -20,12 +20,17 @@ def dibs(
 ):
     seats = [booking_model.Seat(row=seat[0], place=int(seat[1])) for seat in seats_data]
     with uow:
-        screening: booking_model.Screening = uow.repo.get(screening_id=screening_id)
+        screening: booking_model.Screening = uow.repo.get(
+            booking_model.Screening, domain_model_instance_id=screening_id
+        )
         if not screening:
             raise booking_model.ScreeningDoesNotExists(
                 "You want to make a reservation for a non-existing screening"
             )
         reservation = booking_model.Reservation(seats, customer_id, reservation_number)
+        import bpdb
+
+        bpdb.set_trace()
         screening.make(reservation=reservation)
 
         payment = paying_model.Payment(

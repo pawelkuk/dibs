@@ -2,6 +2,7 @@ from __future__ import annotations
 from api.adapters import repository
 import abc
 from api.adapters.orm import default_session_factory
+from functools import partial
 
 
 class AbstractUnitOfWork(abc.ABC):
@@ -13,9 +14,8 @@ class AbstractUnitOfWork(abc.ABC):
     def __exit__(self, *args):
         self.rollback()
 
-    @abc.abstractmethod
     def commit(self):
-        raise NotImplementedError
+        self._commit()
 
     @abc.abstractmethod
     def rollback(self):
@@ -23,8 +23,8 @@ class AbstractUnitOfWork(abc.ABC):
 
 
 class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
-    def __init__(self, session_factory=default_session_factory):
-        self.session_factory = session_factory
+    def __init__(self, isolation_level, session_factory=default_session_factory):
+        self.session_factory = partial(session_factory, isolation_level)
 
     def __enter__(self):
         self.session = self.session_factory()
