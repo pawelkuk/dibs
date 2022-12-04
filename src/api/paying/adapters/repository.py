@@ -39,17 +39,3 @@ class DjangoRepository(AbstractRepository):
 
     def list(self) -> list[model.Payment]:
         return [p.to_domain() for p in django_models.Payment.objects.all()]
-
-
-class SqlAlchemyRepository(AbstractRepository):
-    def __init__(self, session):
-        super().__init__()
-        self.session = session
-
-    def _add(self, payment):
-        self.session.add(payment)
-
-    def _get(self, payment_id: UUID) -> model.Payment:
-        return (
-            self.session.query(model.Payment).filter_by(payment_id=payment_id).first()
-        )
