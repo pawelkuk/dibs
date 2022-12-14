@@ -30,7 +30,11 @@ reservations = Table(
     ),
     Column("screening_id", ForeignKey("booking_screening.screening_id")),
     Column("customer_id", UUID(as_uuid=True), nullable=False),
-    Column("seats", ARRAY(String, dimensions=2), key="seats1"),
+    Column(
+        "seats",
+        ARRAY(String, dimensions=2),
+        key="seats_attr",
+    ),
 )
 
 theatres = Table(
@@ -57,6 +61,6 @@ def start_mappers():
                 reservations_mapper,
                 collection_class=set,
             ),
-            "_seats": ...,
+            # "_seats": column_property(),
         },
     )

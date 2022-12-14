@@ -30,6 +30,13 @@ class SqlAlchemyRepository(AbstractRepository):
         self.session = session
 
     def _add(self, domain_model_instance):
+        match domain_model_instance:
+            case booking_model.Screening():
+                pass
+            case paying_model.Payment() | ticketing_model.Ticket():
+                domain_model_instance.status = domain_model_instance.status.value
+            case _:
+                raise TypeError("This model is not supported")
         self.session.add(domain_model_instance)
 
     def _get(self, domain_model_class: Any, domain_model_instance_id: UUID) -> Any:
@@ -43,8 +50,17 @@ class SqlAlchemyRepository(AbstractRepository):
             case _:
                 raise TypeError("This model is not supported")
             
-        return (
+        res = (
             self.session.query(domain_model_class)
             .filter_by(**{lookup_field:domain_model_instance_id})
             .first()
         )
+        match domain_model_class:
+            case booking_model.Screening:
+                res.events = []
+                for r in res._reservations:
+                    r._seats = {booking_model.Seat(x[0], x[1]) for x in r.seats_attr}
+            case _:
+                pass
+
+        return res

@@ -28,21 +28,18 @@ def dibs(
                 "You want to make a reservation for a non-existing screening"
             )
         reservation = booking_model.Reservation(seats, customer_id, reservation_number)
-        import bpdb
-
-        bpdb.set_trace()
         screening.make(reservation=reservation)
-
+        reservation.seats_attr = [[s.row, s.place] for s in reservation._seats]
         payment = paying_model.Payment(
             amount=amount, currency=currency, user_id=customer_id
         )
         payment_id = payment.pay(payment_success_rate)
-        uow.repo.add(payment=payment)
+        uow.repo.add(payment)
         ticket = ticketing_model.Ticket(
             details=details, reservation_id=reservation.reservation_number
         )
         ticket_id = ticket.render(ticketing_success_rate)
-        uow.repo.add(ticket=ticket)
+        uow.repo.add(ticket)
         uow.commit()
     return {
         "payment_id": payment_id,

@@ -39,7 +39,7 @@ class Payment:
             return self.payment_id
 
         if not self.user_id or not self.amount or not self.currency:
-            raise PaymentError("Insufficient informatation to process payment")
+            raise PaymentError("Insufficient information to process payment")
 
         self.payment_id = self.request_to_payment_provider(payment_success_rate)
         return self.payment_id
