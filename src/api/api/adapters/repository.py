@@ -59,7 +59,7 @@ class SqlAlchemyRepository(AbstractRepository):
             case booking_model.Screening:
                 res.events = []
                 for r in res._reservations:
-                    r._seats = {booking_model.Seat(x[0], x[1]) for x in r.seats_attr}
+                    r._seats = {booking_model.Seat(x[0], int(x[1])) for x in r.seats_attr}
             case _:
                 pass
 
