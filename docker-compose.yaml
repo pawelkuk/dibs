@@ -32,8 +32,10 @@ services:
     volumes:
       - ./volumes/postgres:/var/lib/postgresql
 
+
   postgres_booking:
     image: postgres
+    command: postgres -c config_file=/etc/postgresql.conf
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -42,9 +44,11 @@ services:
       - 5435:5432
     volumes:
       - ./volumes/postgres_booking:/var/lib/postgresql
+      - ./resources/postgresql-coordinator.conf:/etc/postgresql.conf
 
   postgres_ticketing:
     image: postgres
+    command: postgres -c config_file=/etc/postgresql.conf
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -53,9 +57,11 @@ services:
       - 5433:5432
     volumes:
       - ./volumes/postgres_ticketing:/var/lib/postgresql
+      - ./resources/postgresql-participant.conf:/etc/postgresql.conf
 
   postgres_paying:
     image: postgres
+    command: postgres -c config_file=/etc/postgresql.conf
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -64,6 +70,7 @@ services:
       - 5434:5432
     volumes:
       - ./volumes/postgres_paying:/var/lib/postgresql
+      - ./resources/postgresql-participant.conf:/etc/postgresql.conf
 
   pgadmin:
     image: dpage/pgadmin4
