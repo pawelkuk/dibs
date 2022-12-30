@@ -57,9 +57,10 @@ class SqlAlchemyRepository(AbstractRepository):
         )
         match domain_model_class:
             case booking_model.Screening:
-                res.events = []
-                for r in res._reservations:
-                    r._seats = {booking_model.Seat(x[0], int(x[1])) for x in r.seats_attr}
+                if res is not None:
+                    res.events = []
+                    for r in res._reservations:
+                        r._seats = {booking_model.Seat(x[0], int(x[1])) for x in r.seats_attr}
             case _:
                 pass
 

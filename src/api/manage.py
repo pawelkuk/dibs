@@ -3,8 +3,6 @@
 import sys
 import os
 
-sys.path.insert(5, "/my-site-packages")
-
 
 def main():
     """Run administrative tasks."""
