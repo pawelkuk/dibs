@@ -14,6 +14,15 @@ const getSeats = () => {
   return seats.flat();
 };
 
+function choose(choices) {
+  var index = Math.floor(Math.random() * choices.length);
+  return choices[index];
+}
+
+function getRandomPrice(max) {
+  return Math.floor(Math.random() * max * 100) / 100;
+}
+
 function ScreeningList(props) {
   const [screeningList, setScreeningList] = useState([]);
   useEffect(() => {
@@ -93,11 +102,14 @@ function ScreeningRoom(props) {
       return [row, Number(column)];
     });
     axios
-      .post(`${API}/make-reservation`, {
+      .post(`${API}/dibs`, {
         customer_id: uuidv4(),
         screening_id: screeningId,
         reservation_number: uuidv4(),
         seats_data: seatsData,
+        amount: getRandomPrice(10),
+        details: { "agreement signed": true },
+        currency: choose(["GBP", "USD", "PLN"]),
       })
       .catch((error) => {
         alert(error.message);
