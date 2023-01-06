@@ -1,0 +1,13 @@
+{
+  "devDependencies": {
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1"
+  },
+  "scripts": {
+    "dev": "nodemon",
+    "start": "ts-node src/deamon.ts"
+  },
+  "dependencies": {
+    "axios": "^1.2.2"
+  }
+}

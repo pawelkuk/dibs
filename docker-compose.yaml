@@ -134,3 +134,13 @@ services:
       - app
     stdin_open: true
     tty: true
+
+  benchmark:
+    build: ./benchmark
+    command: nodemon
+    volumes:
+      - ./benchmark:/benchmark
+    depends_on:
+      - app
+    stdin_open: true
+    tty: true

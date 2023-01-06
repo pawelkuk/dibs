@@ -22,4 +22,7 @@
     - [x] setup auto-reload for celery
     - [x] write controller (saga workflow) as celery task/multiple tasks
 - [ ] experiment
-- [ ] distributed transactions approach
+    - [ ] script which will reserve seats concurrently
+    - [ ] check for correctness under heavy load
+    - [ ] write trigger/check for uniqueness of reserved seats
+- [x] distributed transactions approach
