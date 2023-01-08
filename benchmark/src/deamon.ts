@@ -26,16 +26,13 @@ function sleep(ms: number) {
 async function main() {
   while (true) {
     await sleep(5000);
-    await axios.get<Screening[]>(API_URL).then((res: AxiosResponse) => {
-      res.data.map((screening: Screening) => {
-        axios
-          .get(`${API_URL}/${screening.screening_id}/`)
-          .then((res: AxiosResponse) => {
-            let screeningDetail: ScreeningDetail = res.data;
-            console.log(screeningDetail.free_seats);
-            console.log(screeningDetail.reservations.flatMap((r) => r.seats));
-          });
-      });
+    const screeningsResponse = await axios.get<Screening[]>(API_URL);
+    screeningsResponse.data.map(async (screening: Screening) => {
+      const screeningDetailResponse = await axios.get(
+        `${API_URL}/${screening.screening_id}/`
+      );
+      const screeningDetail: ScreeningDetail = screeningDetailResponse.data;
+      screeningDetail.free_seats.map(async (seat: string) => {});
     });
   }
 }
