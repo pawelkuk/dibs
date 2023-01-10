@@ -13,7 +13,7 @@ type Reservation = {
   amount: string;
   currency: string;
   details: object | string;
-  seats_data: (number | string)[][];
+  seats_data: ([string, number] | [])[];
 };
 
 type ScreeningDetail = {
