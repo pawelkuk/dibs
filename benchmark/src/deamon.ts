@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError } from "axios";
 import { v4 as uuidv4 } from "uuid";
 
 type Screening = {
@@ -27,8 +27,10 @@ type ScreeningDetail = {
   }[];
   free_seats: string[];
 };
-const API_URL = "http://app/screenings";
-
+const API_URL = "http://app";
+function handleError(err: AxiosError) {
+  console.log(err.message);
+}
 function sleep(ms: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
@@ -88,14 +90,40 @@ function makeReservationData(
 
 async function main() {
   while (true) {
-    const screeningsResponse = await axios.get<Screening[]>(API_URL);
-    screeningsResponse.data.map(async (screening: Screening) => {
-      const screeningDetailResponse = await axios.get(
-        `${API_URL}/${screening.screening_id}/`
+    console.log("next iter!");
+    try {
+      const screeningsResponse = await axios.get<Screening[]>(
+        `${API_URL}/screenings/`
       );
-      const screeningDetail: ScreeningDetail = screeningDetailResponse.data;
-      screeningDetail.free_seats.map(async (seat: string) => {});
-    });
+      screeningsResponse.data.map(async (screening: Screening) => {
+        try {
+          const screeningDetailResponse = await axios.get(
+            `${API_URL}/screenings/${screening.screening_id}/`
+          );
+          const screeningDetail: ScreeningDetail = screeningDetailResponse.data;
+          console.log(
+            screeningDetail.screening_id,
+            screeningDetail.free_seats.length
+          );
+          if (screeningDetail.free_seats) {
+            const reservationData = makeReservationData(screeningDetail, 2);
+            reservationData.map(async (reservation) => {
+              // console.log(reservation);
+              try {
+                const res = await axios.post(`${API_URL}/dibs`, reservation);
+              } catch (error) {
+                handleError(error as AxiosError);
+              }
+              // console.log(reservation.seats_data);
+            });
+          }
+        } catch (error) {
+          handleError(error as AxiosError);
+        }
+      });
+    } catch (error) {
+      handleError(error as AxiosError);
+    }
     await sleep(5000);
   }
 }
