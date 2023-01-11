@@ -1,6 +1,5 @@
 import axios, { AxiosError } from "axios";
 import { v4 as uuidv4 } from "uuid";
-
 type Screening = {
   screening_id: string;
   title: string;
