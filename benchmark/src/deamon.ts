@@ -5,13 +5,13 @@ type Screening = {
   screening_id: string;
   title: string;
 };
-
+type Currency = "GBP" | "USD" | "PLN";
 type Reservation = {
   customer_id: string;
   screening_id: string;
   reservation_number: string;
   amount: string;
-  currency: string;
+  currency: Currency;
   details: object | string;
   seats_data: ([string, number] | [])[];
 };
