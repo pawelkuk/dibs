@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import dj_database_url
 from booking import config
+import psycopg2
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -84,6 +85,9 @@ DATABASES = {
     "booking": dj_database_url.parse(config.get_postgres_uri("postgres_booking")),
     "paying": dj_database_url.parse(config.get_postgres_uri("postgres_paying")),
     "ticketing": dj_database_url.parse(config.get_postgres_uri("postgres_ticketing")),
+}
+DATABASES["booking"]["OPTIONS"] = {
+    "isolation_level": psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE,
 }
 
 

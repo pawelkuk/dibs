@@ -105,11 +105,14 @@ async function main() {
             screeningDetail.free_seats.length
           );
           if (screeningDetail.free_seats) {
-            const reservationData = makeReservationData(screeningDetail, 2);
+            const reservationData = makeReservationData(screeningDetail, 6);
             reservationData.map(async (reservation) => {
-              // console.log(reservation);
+              console.log(reservation.seats_data);
               try {
-                const res = await axios.post(`${API_URL}/dibs`, reservation);
+                const res = await axios.post(
+                  `${API_URL}/dibs-two-phase-commit`,
+                  reservation
+                );
               } catch (error) {
                 handleError(error as AxiosError);
               }
@@ -123,7 +126,7 @@ async function main() {
     } catch (error) {
       handleError(error as AxiosError);
     }
-    await sleep(5000);
+    await sleep(1000);
   }
 }
 
