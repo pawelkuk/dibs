@@ -105,7 +105,7 @@ async function main() {
             screeningDetail.free_seats.length
           );
           if (screeningDetail.free_seats) {
-            const reservationData = makeReservationData(screeningDetail, 2);
+            const reservationData = makeReservationData(screeningDetail, 1);
             reservationData.map(async (reservation) => {
               console.log(reservation.seats_data);
               try {
@@ -123,7 +123,7 @@ async function main() {
     } catch (error) {
       handleError(error as AxiosError);
     }
-    await sleep(4000);
+    await sleep(5000);
   }
 }
 
