@@ -49,20 +49,20 @@ function ScreeningList(props) {
 }
 
 function ScreeningRoom(props) {
-  const socket = io.connect(":3001");
+  const ioSocket = io.connect(":3001");
   const seats = getSeats();
   const [seatsAvailable, setSeatsAvailable] = useState([...seats]);
   const [seatsSelected, setSeatsSelected] = useState([]);
   const [seatsReserved, setSeatsReserved] = useState([]);
-  const [isConnected, setIsConnected] = useState(socket.connected);
+  const [isConnected, setIsConnected] = useState(ioSocket.connected);
   const { screeningId } = useParams();
   useEffect(() => {
-    socket.on("connect", () => {
-      socket.emit("screening", screeningId);
+    ioSocket.on("connect", () => {
+      ioSocket.emit("screening", screeningId);
       setIsConnected(true);
     });
 
-    socket.on("state-change", (state) => {
+    ioSocket.on("state-change", (state) => {
       const sr = [];
       state.reservations.map((res) => sr.push(...res.seats));
       setSeatsReserved(sr);
@@ -72,14 +72,15 @@ function ScreeningRoom(props) {
         })
       );
     });
-    socket.on("disconnect", () => {
+    ioSocket.on("disconnect", () => {
       setIsConnected(false);
     });
 
     return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-      socket.off("state-change");
+      // ioSocket.leave(screeningId);
+      ioSocket.off("connect");
+      ioSocket.off("disconnect");
+      ioSocket.off("state-change");
     };
   }, []);
 

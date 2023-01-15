@@ -68,16 +68,19 @@ app.post("/update", (req, res) => {
 });
 io.on("connection", (socket) => {
   socket.on("screening", (screeningId) => {
+    console.log(`user connected to ${screeningId}`);
+    socket.join(screeningId);
     socket.emit("state-change", state.get(screeningId));
   });
   console.log("a user connected");
   socket.on("disconnect", () => {
+    // socket.leave()
     console.log("user disconnected");
   });
 });
 emitter.on("state-change", (screeningId) => {
   console.log(`update front ${screeningId}`);
-  io.sockets.emit("state-change", state.get(screeningId));
+  io.sockets.in(screeningId).emit("state-change", state.get(screeningId));
 });
 
 server.listen(3001, () => {
