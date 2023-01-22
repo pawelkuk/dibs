@@ -88,6 +88,7 @@ function makeReservationData(
 }
 
 async function main() {
+  await sleep(5000);
   while (true) {
     console.log("next iter!");
     try {
