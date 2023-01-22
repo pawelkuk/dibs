@@ -1,6 +1,34 @@
 version: "3"
 services:
+  haproxy:
+    image: haproxy
+    ports:
+      - "80:80"
+      - "70:70"
+    volumes:
+      - ./resources/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+    depends_on:
+      - app
+      - app_read
 
+  app_read:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      - DB_HOST=postgres
+      - DB_PASSWORD=postgres
+      - API_HOST=app
+      - PYTHONDONTWRITEBYTECODE=1
+    volumes:
+      - ./src/:/src/
+    ports:
+      - 5006:80
+    stdin_open: true
+    # command: sleep 9999
+    tty: true
   app:
     build:
       context: .

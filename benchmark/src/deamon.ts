@@ -26,7 +26,7 @@ type ScreeningDetail = {
   }[];
   free_seats: string[];
 };
-const API_URL = "http://app";
+const API_URL = "http://haproxy";
 function handleError(err: AxiosError) {
   console.log(err.message);
 }

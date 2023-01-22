@@ -17,12 +17,12 @@ function sleep(ms) {
 
 getState = async (backoff) => {
   try {
-    const response = await axios.get("http://app:80/screenings/");
+    const response = await axios.get("http://haproxy:80/screenings/");
     const screenings = response.data;
     screenings.forEach((obj) => {
       const screeningId = obj["screening_id"];
       axios
-        .get(`http://app:80/screenings/${screeningId}/`)
+        .get(`http://haproxy:80/screenings/${screeningId}/`)
         .then((res) => {
           state.set(screeningId, res.data);
           console.log(`${screeningId} screening data ready`);

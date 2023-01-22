@@ -5,7 +5,7 @@ import axios from "axios";
 import { Routes, Route, Link, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
-const API = "http://localhost:5005";
+const API = "http://localhost:80";
 const getSeats = () => {
   const row = [...Array(25).keys()].map((el) => el + 1);
   const alpha = Array.from(Array(26)).map((e, i) => i + 97);
