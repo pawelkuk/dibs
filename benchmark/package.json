@@ -9,6 +9,7 @@
     "start": "ts-node src/deamon.ts"
   },
   "dependencies": {
+    "@commander-js/extra-typings": "^10.0.1",
     "@types/uuid": "^9.0.0",
     "axios": "^1.2.2",
     "commander": "^10.0.0",
