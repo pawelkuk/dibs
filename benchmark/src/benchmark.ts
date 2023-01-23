@@ -14,7 +14,13 @@ type Reservation = {
   details: object | string;
   seats_data: ([string, number] | [])[];
 };
-
+type Options = {
+  mode: string;
+  delay: number;
+  number: number;
+  iterations: number;
+  verbose: boolean;
+};
 type ScreeningDetail = {
   screening_id: string;
   theatre: { theatre_id: string };
@@ -87,9 +93,9 @@ function makeReservationData(
   return reservations;
 }
 
-async function main() {
-  await sleep(5000);
-  while (true) {
+async function main(options: Options) {
+  console.log("starting benchmark");
+  for (let i = 0; i < options.iterations; i++) {
     console.log("next iter!");
     try {
       const screeningsResponse = await axios.get<Screening[]>(
@@ -106,11 +112,17 @@ async function main() {
             screeningDetail.free_seats.length
           );
           if (screeningDetail.free_seats) {
-            const reservationData = makeReservationData(screeningDetail, 1);
+            const reservationData = makeReservationData(
+              screeningDetail,
+              options.number
+            );
             reservationData.map(async (reservation) => {
               console.log(reservation.seats_data);
               try {
-                const res = await axios.post(`${API_URL}/dibs`, reservation);
+                const res = await axios.post(
+                  `${API_URL}/${options.mode}`,
+                  reservation
+                );
               } catch (error) {
                 handleError(error as AxiosError);
               }
@@ -124,8 +136,8 @@ async function main() {
     } catch (error) {
       handleError(error as AxiosError);
     }
-    await sleep(5000);
+    await sleep(options.delay);
   }
 }
 
-main();
+export default main;

@@ -1,11 +1,20 @@
 import { Command, Option } from "@commander-js/extra-typings";
-
+import main from "./benchmark";
 // working pattern
 const program = new Command()
   .addOption(
     new Option("-m, --mode <string>", "mode in which to run benchmark")
       .default("2pc")
       .choices(["saga", "2pc"])
+      .argParser((value) => {
+        if (value === "saga") {
+          return "dibs";
+        } else if (value === "2pc") {
+          return "dibs-two-phase-commit";
+        } else {
+          throw new Error("Invalid mode");
+        }
+      })
   )
   .addOption(
     new Option(
@@ -27,3 +36,5 @@ const program = new Command()
   )
   .option("-v, --verbose", "verbose output", false);
 const options = program.opts();
+
+main(options);
