@@ -27,5 +27,5 @@
     - [ ] write trigger/check for uniqueness of reserved seats
     - [x] different container for read and write path (CQRS) because due to writes reads become unresponsive due to queueing up requests on django
     - [x] read model service shows all screenings instead of just one with uuid given in url
-    - [ ] benchmark przepisać na CLI
+    - [x] benchmark przepisać na CLI
 - [x] distributed transactions approach
