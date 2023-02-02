@@ -30,3 +30,10 @@ export type ScreeningDetail = {
   }[];
   free_seats: string[];
 };
+
+export type DoubleBookedSeats = {
+  doubleBookedSeats: {
+    [key: string]: number;
+  };
+  movie: string;
+};

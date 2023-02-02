@@ -1,7 +1,12 @@
 import { API_URL } from "./constants";
 import axios, { AxiosError } from "axios";
-import { Screening, ScreeningDetail } from "./types";
+import { DoubleBookedSeats, Screening, ScreeningDetail } from "./types";
 import { handleError } from "./utils";
+function Counter(array: string[]) {
+  var count: { [key: string]: number } = {};
+  array.forEach((val) => (count[val] = (count[val] || 0) + 1));
+  return count;
+}
 
 function notEmpty<T>(value: T | null | undefined): value is T {
   return value !== null && value !== undefined;
@@ -33,13 +38,29 @@ const getScreeningDetails = async (screenings: Screening[]) => {
     })
   );
 };
+const findDoubleBooked = (
+  screeningDetail: ScreeningDetail
+): DoubleBookedSeats => {
+  const allBookedSeats = screeningDetail.reservations
+    .map((r) => r.seats)
+    .flat();
+  const counter = Counter(allBookedSeats);
+  let k: keyof typeof counter;
+  for (k in counter) if (counter[k] === 1) delete counter[k];
+  return { doubleBookedSeats: counter, movie: screeningDetail.movie.title };
+};
 
-async () => {
+async function main() {
+  console.log("start");
   const screeningsResponse = await getScreenings();
   if (!screeningsResponse) {
+    console.log("no screenings found");
     return;
   }
   const screeningDetails = (
     await getScreeningDetails(screeningsResponse)
   ).filter(notEmpty);
-};
+  const doubleBooked = screeningDetails.map(findDoubleBooked);
+  console.log(doubleBooked);
+}
+main();
