@@ -165,7 +165,7 @@ services:
 
   benchmark:
     build: ./benchmark
-    command: nodemon
+    entrypoint: sleep 99999
     volumes:
       - ./benchmark:/benchmark
     depends_on:

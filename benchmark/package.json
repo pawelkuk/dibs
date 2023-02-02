@@ -6,7 +6,7 @@
   },
   "scripts": {
     "dev": "nodemon",
-    "start": "ts-node src/deamon.ts"
+    "start": "ts-node src/cli.ts"
   },
   "dependencies": {
     "@commander-js/extra-typings": "^10.0.1",

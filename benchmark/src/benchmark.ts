@@ -118,6 +118,7 @@ async function main(options: Options) {
             );
             reservationData.map(async (reservation) => {
               console.log(reservation.seats_data);
+              console.log(options.mode);
               try {
                 const res = await axios.post(
                   `${API_URL}/${options.mode}`,

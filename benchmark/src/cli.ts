@@ -34,7 +34,9 @@ const program = new Command()
       .default(10)
       .argParser((value) => parseInt(value))
   )
-  .option("-v, --verbose", "verbose output", false);
+  .option("-v, --verbose", "verbose output", false)
+  .parse(process.argv);
+
 const options = program.opts();
 
 main(options);
