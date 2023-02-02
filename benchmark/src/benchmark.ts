@@ -1,41 +1,9 @@
 import axios, { AxiosError } from "axios";
 import { v4 as uuidv4 } from "uuid";
-type Screening = {
-  screening_id: string;
-  title: string;
-};
-type Currency = "GBP" | "USD" | "PLN";
-type Reservation = {
-  customer_id: string;
-  screening_id: string;
-  reservation_number: string;
-  amount: string;
-  currency: Currency;
-  details: object | string;
-  seats_data: ([string, number] | [])[];
-};
-type Options = {
-  mode: string;
-  delay: number;
-  number: number;
-  iterations: number;
-  verbose: boolean;
-};
-type ScreeningDetail = {
-  screening_id: string;
-  theatre: { theatre_id: string };
-  movie: { title: string };
-  reservations: {
-    reservation_number: string;
-    seats: string[];
-    customer_id: string;
-  }[];
-  free_seats: string[];
-};
-const API_URL = "http://haproxy";
-function handleError(err: AxiosError) {
-  console.log(err.message);
-}
+import { API_URL } from "./constants";
+import { Options, Reservation, Screening, ScreeningDetail } from "./types";
+import { handleError } from "./utils";
+
 function sleep(ms: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
@@ -101,7 +69,7 @@ async function main(options: Options) {
       const screeningsResponse = await axios.get<Screening[]>(
         `${API_URL}/screenings/`
       );
-      screeningsResponse.data.map(async (screening: Screening) => {
+      screeningsResponse.data.map(async (screening) => {
         try {
           const screeningDetailResponse = await axios.get(
             `${API_URL}/screenings/${screening.screening_id}/`
