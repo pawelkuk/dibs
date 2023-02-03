@@ -23,19 +23,23 @@ class AbstractUnitOfWork(abc.ABC):
 
 
 class DjangoUnitOfWork(AbstractUnitOfWork):
+    def __init__(self, using="default") -> None:
+        self.using = using
+        super().__init__()
+
     def __enter__(self):
         self.tickets = repository.DjangoRepository()
-        transaction.set_autocommit(False)
+        transaction.set_autocommit(False, using=self.using)
         return super().__enter__()
 
     def __exit__(self, *args):
         super().__exit__(*args)
-        transaction.set_autocommit(True)
+        transaction.set_autocommit(True, using=self.using)
 
     def commit(self):
         for ticket in self.tickets.seen:
             self.tickets.update(ticket)
-        transaction.commit()
+        transaction.commit(using=self.using)
 
     def rollback(self):
-        transaction.rollback()
+        transaction.rollback(using=self.using)

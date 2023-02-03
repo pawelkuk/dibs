@@ -14,7 +14,7 @@ def render_ticket(request: HttpRequest):
         ticket_id = services.render_ticket(
             details=data["details"],
             reservation_id=uuid.UUID(data["reservation_id"]),
-            uow=unit_of_work.DjangoUnitOfWork(),
+            uow=unit_of_work.DjangoUnitOfWork("ticketing"),
             success_rate=settings.TICKET_RENDER_SUCCESS_RATE,
         )
     except model.TicketRenderError as e:

@@ -17,7 +17,7 @@ def make_reservation(request: HttpRequest):
             screening_id=uuid.UUID(data["screening_id"]),
             reservation_number=uuid.UUID(data["reservation_number"]),
             seats_data=data["seats_data"],
-            uow=unit_of_work.DjangoUnitOfWork(),
+            uow=unit_of_work.DjangoUnitOfWork("booking"),
         )
     except Exception as e:
         return JsonResponse({"message": str(e)}, status=400)
@@ -38,7 +38,7 @@ def cancel_reservation(request: HttpRequest):
         services.cancel_reservation(
             reservation_number=uuid.UUID(data["reservation_number"]),
             screening_id=uuid.UUID(data["screening_id"]),
-            uow=unit_of_work.DjangoUnitOfWork(),
+            uow=unit_of_work.DjangoUnitOfWork("booking"),
         )
     except Exception as e:
         return JsonResponse({"message": str(e)}, status=400)

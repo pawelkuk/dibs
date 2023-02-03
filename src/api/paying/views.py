@@ -15,7 +15,7 @@ def pay(request: HttpRequest):
             amount=data["amount"],
             currency=model.Currency[data["currency"]],
             user_id=uuid.UUID(data["user_id"]),
-            uow=unit_of_work.DjangoUnitOfWork(),
+            uow=unit_of_work.DjangoUnitOfWork("paying"),
             payment_success_rate=settings.PAYMENT_SUCCESS_RATE,
         )
     except model.PaymentError as e:
@@ -29,7 +29,7 @@ def refund(request: HttpRequest):
     try:
         services.refund(
             payment_id=data["payment_id"],
-            uow=unit_of_work.DjangoUnitOfWork(),
+            uow=unit_of_work.DjangoUnitOfWork("paying"),
         )
     except model.PaymentError as e:
         return JsonResponse({"message": str(e)}, status=400)

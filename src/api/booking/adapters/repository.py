@@ -1,9 +1,7 @@
 import abc
 from uuid import UUID
-
 from booking.domain import model
 from booking import models as django_models
-
 
 
 class AbstractRepository(abc.ABC):
@@ -33,9 +31,13 @@ class DjangoRepository(AbstractRepository):
         django_models.Screening.update_from_domain(screening)
 
     def _get(self, screening_id: UUID) -> model.Screening:
-        s = django_models.Screening.objects.filter(screening_id=screening_id).first()
+        s = (
+            django_models.Screening.objects.select_for_update()
+            .filter(screening_id=screening_id)
+            .prefetch_related("reservations")
+            .first()
+        )
         return s.to_domain() if s else s
 
     def list(self) -> list[model.Screening]:
         return [s.to_domain() for s in django_models.Screening.objects.all()]
-

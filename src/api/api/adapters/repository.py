@@ -5,6 +5,7 @@ from booking.domain import model as booking_model
 from ticketing.domain import model as ticketing_model
 from paying.domain import model as paying_model
 
+
 class AbstractRepository(abc.ABC):
     def __init__(self):
         self.seen: set = set()
@@ -49,10 +50,11 @@ class SqlAlchemyRepository(AbstractRepository):
                 lookup_field = "ticket_id"
             case _:
                 raise TypeError("This model is not supported")
-            
+
         res = (
             self.session.query(domain_model_class)
-            .filter_by(**{lookup_field:domain_model_instance_id})
+            .filter_by(**{lookup_field: domain_model_instance_id})
+            .with_for_update()
             .first()
         )
         match domain_model_class:
@@ -60,7 +62,9 @@ class SqlAlchemyRepository(AbstractRepository):
                 if res is not None:
                     res.events = []
                     for r in res._reservations:
-                        r._seats = {booking_model.Seat(x[0], int(x[1])) for x in r.seats_attr}
+                        r._seats = {
+                            booking_model.Seat(x[0], int(x[1])) for x in r.seats_attr
+                        }
             case _:
                 pass
 
