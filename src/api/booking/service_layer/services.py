@@ -14,13 +14,16 @@ def make_reservation(
 ):
     seats = [model.Seat(row=seat[0], place=int(seat[1])) for seat in seats_data]
     with uow:
-        screening: model.Screening = uow.screenings.get(screening_id=screening_id)
+        screening: model.Screening = uow.repo.get(
+            model.Screening, domain_model_instance_id=screening_id
+        )
         if not screening:
             raise model.ScreeningDoesNotExists(
                 "You want to make a reservation for a non-existing screening"
             )
         reservation = model.Reservation(seats, customer_id, reservation_number)
         screening.make(reservation=reservation)
+        reservation.seats_attr = [[s.row, s.place] for s in reservation._seats]
         uow.commit()
 
 
@@ -30,7 +33,9 @@ def cancel_reservation(
     uow: unit_of_work.AbstractUnitOfWork,
 ):
     with uow:
-        screening: model.Screening = uow.screenings.get(screening_id=screening_id)
+        screening: model.Screening = uow.repo.get(
+            model.Screening, domain_model_instance_id=screening_id
+        )
         if not screening:
             raise model.ScreeningDoesNotExists(
                 "You try to cancel a reservation for a non existing screening"

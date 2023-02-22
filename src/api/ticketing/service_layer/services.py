@@ -12,6 +12,6 @@ def render_ticket(
     with uow:
         ticket = model.Ticket(details=details, reservation_id=reservation_id)
         ticket_id = ticket.render(success_rate)
-        uow.tickets.add(ticket=ticket)
+        uow.repo.add(ticket)
         uow.commit()
     return ticket_id

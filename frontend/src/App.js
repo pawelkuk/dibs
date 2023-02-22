@@ -94,7 +94,7 @@ function ScreeningRoom(props) {
       setSeatsAvailable(seatsAvailable.filter((res) => res !== seat));
     }
   }
-  function onClickReservation(seats) {
+  function onClickReservation(seats, endpoint = "dibs") {
     const digitsPattern = /[0-9]+/g;
     const letterPattern = /[a-zA-Z]+/g;
     const seatsData = seats.map((seat) => {
@@ -103,7 +103,7 @@ function ScreeningRoom(props) {
       return [row, Number(column)];
     });
     axios
-      .post(`${API}/dibs`, {
+      .post(`${API}/${endpoint}`, {
         customer_id: uuidv4(),
         screening_id: screeningId,
         reservation_number: uuidv4(),
@@ -196,9 +196,18 @@ function DrawGrid(props) {
 
 function MakeReservation(props) {
   return (
-    <button onClick={(e) => props.onClickReservation(props.selected)}>
-      Dibs!
-    </button>
+    <div>
+      <button onClick={(e) => props.onClickReservation(props.selected)}>
+        Saga Dibs!
+      </button>
+      <button
+        onClick={(e) =>
+          props.onClickReservation(props.selected, "dibs-two-phase-commit")
+        }
+      >
+        2PC Dibs!
+      </button>
+    </div>
   );
 }
 function AvailableList(props) {

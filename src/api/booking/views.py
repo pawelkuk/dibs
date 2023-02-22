@@ -1,11 +1,14 @@
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import ujson as json
-from booking.service_layer import services, unit_of_work
+from booking.service_layer import services
+from api.service_layer import unit_of_work
+
 import uuid
 from rest_framework import viewsets
 from booking.serializers import ScreeningListSerializer, ScreeningSerializer
 from booking import models
+from django.conf import settings
 
 
 @csrf_exempt
@@ -17,7 +20,7 @@ def make_reservation(request: HttpRequest):
             screening_id=uuid.UUID(data["screening_id"]),
             reservation_number=uuid.UUID(data["reservation_number"]),
             seats_data=data["seats_data"],
-            uow=unit_of_work.DjangoUnitOfWork("booking"),
+            uow=unit_of_work.SqlAlchemyUnitOfWork(settings.SQL_ALCHEMY_ISOLATION_LEVEL),
         )
     except Exception as e:
         return JsonResponse({"message": str(e)}, status=400)
@@ -38,7 +41,7 @@ def cancel_reservation(request: HttpRequest):
         services.cancel_reservation(
             reservation_number=uuid.UUID(data["reservation_number"]),
             screening_id=uuid.UUID(data["screening_id"]),
-            uow=unit_of_work.DjangoUnitOfWork("booking"),
+            uow=unit_of_work.SqlAlchemyUnitOfWork(settings.SQL_ALCHEMY_ISOLATION_LEVEL),
         )
     except Exception as e:
         return JsonResponse({"message": str(e)}, status=400)

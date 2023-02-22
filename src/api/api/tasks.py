@@ -92,7 +92,7 @@ def dibs(init_input):
         "user_id": init_input["customer_id"],
         "reservation_number": init_input["reservation_number"],
         "amount": str(init_input["amount"]),
-        "currency": init_input["currency"],
+        "currency": init_input["currency"].value,
     }
     ticket_kwargs = {
         "reservation_id": init_input["reservation_number"],

@@ -1,6 +1,7 @@
 import string
 from rest_framework import serializers
 import uuid
+from paying.domain import model
 
 
 def uuid_format(data):
@@ -41,3 +42,6 @@ class DibsSerializer(serializers.Serializer):
         ),
         allow_empty=False,
     )
+
+    def validate_currency(self, val):
+        return model.Currency(val)

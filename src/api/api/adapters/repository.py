@@ -34,7 +34,10 @@ class SqlAlchemyRepository(AbstractRepository):
         match domain_model_instance:
             case booking_model.Screening():
                 pass
-            case paying_model.Payment() | ticketing_model.Ticket():
+            case paying_model.Payment():
+                domain_model_instance.status = domain_model_instance.status.value
+                domain_model_instance.currency = domain_model_instance.currency.value
+            case ticketing_model.Ticket():
                 domain_model_instance.status = domain_model_instance.status.value
             case _:
                 raise TypeError("This model is not supported")
@@ -57,6 +60,7 @@ class SqlAlchemyRepository(AbstractRepository):
             .with_for_update()
             .first()
         )
+
         match domain_model_class:
             case booking_model.Screening:
                 if res is not None:
