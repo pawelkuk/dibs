@@ -33,8 +33,10 @@ class AbstractUnitOfWork(abc.ABC):
 
 
 class SqlAlchemyUnitOfWork(AbstractUnitOfWork):
-    def __init__(self, isolation_level, session_factory=default_session_factory):
-        self.session_factory = partial(session_factory, isolation_level)
+    def __init__(
+        self, isolation_level, session_factory=default_session_factory, twophase=True
+    ):
+        self.session_factory = partial(session_factory, isolation_level, twophase)
 
     def __enter__(self):
         self.session = self.session_factory()

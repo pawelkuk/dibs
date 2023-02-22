@@ -6,7 +6,7 @@ from paying.adapters import orm as paying_orm
 from ticketing.adapters import orm as ticketing_orm
 
 
-def default_session_factory(isolation_level):
+def default_session_factory(isolation_level, twophase=True):
     paying_engine = create_engine(
         config.get_postgres_uri("postgres_paying"),
         isolation_level=isolation_level,
@@ -26,7 +26,7 @@ def default_session_factory(isolation_level):
         echo=True,
     )
 
-    Session = sessionmaker(twophase=True)
+    Session = sessionmaker(twophase=twophase)
     Session.configure(
         binds={
             paying_orm.payments: paying_engine,

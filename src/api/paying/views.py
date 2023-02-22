@@ -17,7 +17,9 @@ def pay(request: HttpRequest):
             amount=data["amount"],
             currency=model.Currency[data["currency"]],
             user_id=uuid.UUID(data["user_id"]),
-            uow=unit_of_work.SqlAlchemyUnitOfWork(settings.SQL_ALCHEMY_ISOLATION_LEVEL),
+            uow=unit_of_work.SqlAlchemyUnitOfWork(
+                settings.SQL_ALCHEMY_ISOLATION_LEVEL, twophase=False
+            ),
             payment_success_rate=settings.PAYMENT_SUCCESS_RATE,
         )
     except model.PaymentError as e:
@@ -31,7 +33,9 @@ def refund(request: HttpRequest):
     try:
         services.refund(
             payment_id=data["payment_id"],
-            uow=unit_of_work.SqlAlchemyUnitOfWork(settings.SQL_ALCHEMY_ISOLATION_LEVEL),
+            uow=unit_of_work.SqlAlchemyUnitOfWork(
+                settings.SQL_ALCHEMY_ISOLATION_LEVEL, twophase=False
+            ),
         )
     except model.PaymentError as e:
         return JsonResponse({"message": str(e)}, status=400)
