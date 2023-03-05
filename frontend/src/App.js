@@ -48,21 +48,12 @@ function ScreeningList(props) {
   );
 }
 
-function ScreeningRoom(props) {
-  const ioSocket = io.connect(":3001");
-  const seats = getSeats();
-  const [seatsAvailable, setSeatsAvailable] = useState([...seats]);
+function SeatArea(props) {
+  const [seatsAvailable, setSeatsAvailable] = useState([...props.seats]);
   const [seatsSelected, setSeatsSelected] = useState([]);
   const [seatsReserved, setSeatsReserved] = useState([]);
-  const [isConnected, setIsConnected] = useState(ioSocket.connected);
-  const { screeningId } = useParams();
   useEffect(() => {
-    ioSocket.on("connect", () => {
-      ioSocket.emit("screening", screeningId);
-      setIsConnected(true);
-    });
-
-    ioSocket.on("state-change", (state) => {
+    props.ioSocket.on("state-change", (state) => {
       const sr = [];
       state.reservations.map((res) => sr.push(...res.seats));
       setSeatsReserved(sr);
@@ -72,16 +63,6 @@ function ScreeningRoom(props) {
         })
       );
     });
-    ioSocket.on("disconnect", () => {
-      setIsConnected(false);
-    });
-
-    return () => {
-      // ioSocket.leave(screeningId);
-      ioSocket.off("connect");
-      ioSocket.off("disconnect");
-      ioSocket.off("state-change");
-    };
   }, []);
 
   function onClickData(seat) {
@@ -94,6 +75,7 @@ function ScreeningRoom(props) {
       setSeatsAvailable(seatsAvailable.filter((res) => res !== seat));
     }
   }
+
   function onClickReservation(seats, endpoint = "dibs") {
     const digitsPattern = /[0-9]+/g;
     const letterPattern = /[a-zA-Z]+/g;
@@ -105,7 +87,7 @@ function ScreeningRoom(props) {
     axios
       .post(`${API}/${endpoint}`, {
         customer_id: uuidv4(),
-        screening_id: screeningId,
+        screening_id: props.screeningId,
         reservation_number: uuidv4(),
         seats_data: seatsData,
         amount: getRandomPrice(10),
@@ -119,22 +101,50 @@ function ScreeningRoom(props) {
   }
   return (
     <div>
+      <h1>
+        <Link to={"/"}>Dibs - Seat Reservation System</Link>
+      </h1>
+      <DrawGrid
+        seat={props.seats}
+        available={seatsAvailable}
+        selected={seatsSelected}
+        reserved={seatsReserved}
+        onClickData={(seat) => onClickData(seat)}
+        onClickReservation={onClickReservation}
+      />
+    </div>
+  );
+}
+
+function ScreeningRoom(props) {
+  const ioSocket = io.connect(":3001");
+  const seats = getSeats();
+
+  const [isConnected, setIsConnected] = useState(ioSocket.connected);
+  const { screeningId } = useParams();
+  useEffect(() => {
+    ioSocket.on("connect", () => {
+      ioSocket.emit("screening", screeningId);
+      setIsConnected(true);
+    });
+
+    ioSocket.on("disconnect", () => {
+      setIsConnected(false);
+    });
+
+    return () => {
+      ioSocket.off("connect");
+      ioSocket.off("disconnect");
+      ioSocket.off("state-change");
+    };
+  }, []);
+
+  return (
+    <div>
       <div>
         <p>Connected: {"" + isConnected}</p>
       </div>
-      <div>
-        <h1>
-          <Link to={"/"}>Dibs - Seat Reservation System</Link>
-        </h1>
-        <DrawGrid
-          seat={seats}
-          available={seatsAvailable}
-          selected={seatsSelected}
-          reserved={seatsReserved}
-          onClickData={(seat) => onClickData(seat)}
-          onClickReservation={onClickReservation}
-        />
-      </div>
+      <SeatArea seats={seats} ioSocket={ioSocket} screeningId={screeningId} />
     </div>
   );
 }
