@@ -40,7 +40,6 @@ def dibs(
 
         screening.make(reservation=reservation)
 
-        # reservation.seats_attr = [[s.row, s.place] for s in reservation._seats]
         reservation._seats2.update(reservation._seats)
         payment = paying_model.Payment(
             amount=amount, currency=currency, user_id=customer_id
