@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, String, ForeignKey, ARRAY
+from sqlalchemy import Table, Column, String, ForeignKey, ARRAY, Integer
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
@@ -30,11 +30,16 @@ reservations = Table(
     ),
     Column("screening_id", ForeignKey("booking_screening.screening_id")),
     Column("customer_id", UUID(as_uuid=True), nullable=False),
-    Column(
-        "seats",
-        ARRAY(String, dimensions=2),
-        key="seats_attr",
-    ),
+)
+
+seats = Table(
+    "booking_seat",
+    mapper_registry.metadata,
+    Column("id", Integer, primary_key=True),
+    Column("row", String(3)),
+    Column("place", Integer),
+    Column("screening_id", ForeignKey("booking_screening.screening_id")),
+    Column("reservation_id", ForeignKey("booking_reservation.reservation_number")),
 )
 
 theatres = Table(
@@ -48,8 +53,13 @@ theatres = Table(
 def start_mappers():
     movies_mapper = mapper_registry.map_imperatively(model.Movie, movies)
     theatres_mapper = mapper_registry.map_imperatively(model.Theatre, theatres)
+    seats_mapper = mapper_registry.map_imperatively(model.Seat, seats)
     reservations_mapper = mapper_registry.map_imperatively(
-        model.Reservation, reservations
+        model.Reservation,
+        reservations,
+        properties={
+            "_seats2": relationship(seats_mapper, collection_class=set, lazy="joined")
+        },
     )
     mapper_registry.map_imperatively(
         model.Screening,
@@ -61,6 +71,5 @@ def start_mappers():
                 reservations_mapper,
                 collection_class=set,
             ),
-            # "_seats": column_property(),
         },
     )

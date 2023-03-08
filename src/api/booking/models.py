@@ -26,7 +26,16 @@ class Theatre(models.Model):
     )
 
     def to_domain(self) -> model.Theatre:
-        seats = (model.Seat(row=seat[0], place=int(seat[1])) for seat in self.seats)
+        seats = (
+            model.Seat(
+                row=seat[0],
+                place=int(seat[1]),
+                id=None,
+                reservation_id=None,
+                screening_id=None,
+            )
+            for seat in self.seats
+        )
         return model.Theatre(self.theatre_id, seats)
 
     @staticmethod
@@ -69,16 +78,22 @@ class Reservation(models.Model):
     reservation_number = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False
     )
-    seats = ArrayField(
-        ArrayField(models.CharField(max_length=3, null=False), size=2, null=False),
-    )
     screening = models.ForeignKey(
         Screening, related_name="reservations", on_delete=models.CASCADE, null=True
     )
     customer_id = models.UUIDField(null=False)
 
     def to_domain(self) -> model.Reservation:
-        seats = (model.Seat(row=s[0], place=int(s[1])) for s in self.seats)
+        seats = (
+            model.Seat(
+                row=s.row,
+                place=s.place,
+                id=None,
+                screening_id=None,
+                reservation_id=None,
+            )
+            for s in self.reservation_seats.all()
+        )
         return model.Reservation(seats, self.customer_id, self.reservation_number)
 
     @staticmethod
@@ -93,3 +108,24 @@ class Reservation(models.Model):
         r.seats = [[s.row, s.place] for s in reservation.seats]
         r.save()
         return r
+
+
+class Seat(models.Model):
+    place = models.IntegerField(null=False)
+    row = models.CharField(max_length=3, null=False)
+    reservation = models.ForeignKey(
+        Reservation,
+        related_name="reservation_seats",
+        on_delete=models.CASCADE,
+        null=False,
+    )
+    screening = models.ForeignKey(
+        Screening, related_name="seats", on_delete=models.CASCADE, null=False
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["row", "place", "screening_id"], name="no_seat_double_booking"
+            )
+        ]

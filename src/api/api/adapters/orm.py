@@ -35,6 +35,7 @@ def default_session_factory(isolation_level, twophase=True):
             booking_orm.reservations: booking_engine,
             booking_orm.screenings: booking_engine,
             booking_orm.theatres: booking_engine,
+            booking_orm.seats: booking_engine,
         }
     )
     return Session()

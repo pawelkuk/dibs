@@ -12,7 +12,6 @@ def make_reservation(
     seats_data: Iterable[tuple[str, int]],
     uow: unit_of_work.AbstractUnitOfWork,
 ):
-    seats = [model.Seat(row=seat[0], place=int(seat[1])) for seat in seats_data]
     with uow:
         screening: model.Screening = uow.repo.get(
             model.Screening, domain_model_instance_id=screening_id
@@ -21,9 +20,19 @@ def make_reservation(
             raise model.ScreeningDoesNotExists(
                 "You want to make a reservation for a non-existing screening"
             )
+        seats = [
+            model.Seat(
+                id=None,
+                row=seat[0],
+                place=int(seat[1]),
+                screening_id=screening.screening_id,
+                reservation_id=None,
+            )
+            for seat in seats_data
+        ]
         reservation = model.Reservation(seats, customer_id, reservation_number)
         screening.make(reservation=reservation)
-        reservation.seats_attr = [[s.row, s.place] for s in reservation._seats]
+        reservation._seats2.update(reservation._seats)
         uow.commit()
 
 

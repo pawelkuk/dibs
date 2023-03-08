@@ -18,7 +18,6 @@ def dibs(
     details: dict,
     uow: unit_of_work.SqlAlchemyUnitOfWork,
 ):
-    seats = [booking_model.Seat(row=seat[0], place=int(seat[1])) for seat in seats_data]
     with uow:
         screening: booking_model.Screening = uow.repo.get(
             booking_model.Screening, domain_model_instance_id=screening_id
@@ -27,9 +26,22 @@ def dibs(
             raise booking_model.ScreeningDoesNotExists(
                 "You want to make a reservation for a non-existing screening"
             )
+        seats = [
+            booking_model.Seat(
+                id=None,
+                row=seat[0],
+                place=int(seat[1]),
+                screening_id=screening.screening_id,
+                reservation_id=None,
+            )
+            for seat in seats_data
+        ]
         reservation = booking_model.Reservation(seats, customer_id, reservation_number)
+
         screening.make(reservation=reservation)
-        reservation.seats_attr = [[s.row, s.place] for s in reservation._seats]
+
+        # reservation.seats_attr = [[s.row, s.place] for s in reservation._seats]
+        reservation._seats2.update(reservation._seats)
         payment = paying_model.Payment(
             amount=amount, currency=currency, user_id=customer_id
         )

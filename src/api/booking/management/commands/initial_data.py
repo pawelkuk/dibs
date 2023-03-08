@@ -59,12 +59,16 @@ class Command(BaseCommand):
             reservation = models.Reservation()
             n_of_seats = random.randint(1, 4)
             try:
-                reservation.seats = [next(seats) for _ in range(n_of_seats)]
+                res_seats = [next(seats) for _ in range(n_of_seats)]
             except Exception:
                 break
             reservation.screening = screening
             reservation.customer_id = uuid4()
             reservation.save()
+            for row, place in res_seats:
+                models.Seat.objects.create(
+                    row=row, place=place, reservation=reservation, screening=screening
+                )
             if random.random() < 0.5:
                 continue
             payment = Payment(

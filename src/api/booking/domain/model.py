@@ -20,10 +20,22 @@ class ScreeningDoesNotExists(Exception):
     pass
 
 
-@dataclass(frozen=True)
+@dataclass
 class Seat:
+    id: int
     row: str
     place: int
+    reservation_id: UUID
+    screening_id: UUID
+
+    def __hash__(self):
+        hashed = hash(
+            tuple(getattr(self, key) for key in ("row", "place", "screening_id"))
+        )
+        return hashed
+
+    def __eq__(self, __o: object) -> bool:
+        return hash(self) == hash(__o)
 
 
 @dataclass
