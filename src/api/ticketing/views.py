@@ -4,9 +4,11 @@ import ujson as json
 from ticketing.domain import model
 from ticketing.service_layer import services
 from api.service_layer import unit_of_work
-
+from ticketing import models
 import uuid
 from django.conf import settings
+from ticketing import serializers
+from rest_framework import viewsets
 
 
 @csrf_exempt
@@ -24,3 +26,8 @@ def render_ticket(request: HttpRequest):
     except model.TicketRenderError as e:
         return JsonResponse({"message": str(e)}, status=400)
     return JsonResponse({"success": True, "ticket_id": ticket_id}, status=201)
+
+
+class TicketViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.Ticket.objects.all()
+    serializer_class = serializers.TicketSerializer

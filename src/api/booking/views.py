@@ -54,7 +54,9 @@ def cancel_reservation(request: HttpRequest):
 
 
 class ScreeningViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = models.Screening.objects.all()
+    queryset = models.Screening.objects.all().prefetch_related(
+        "reservations", "reservations__reservation_seats"
+    )
 
     def get_serializer_class(self):
         if self.action_map["get"] == "list":

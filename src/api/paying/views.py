@@ -2,8 +2,12 @@ from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import ujson as json
 from paying.domain import model
+from paying import models
 from paying.service_layer import services
 from api.service_layer import unit_of_work
+from rest_framework import viewsets
+from paying import serializers
+
 
 import uuid
 from django.conf import settings
@@ -40,3 +44,8 @@ def refund(request: HttpRequest):
     except model.PaymentError as e:
         return JsonResponse({"message": str(e)}, status=400)
     return JsonResponse({"success": True}, status=200)
+
+
+class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.Payment.objects.all()
+    serializer_class = serializers.PaymentSerializer

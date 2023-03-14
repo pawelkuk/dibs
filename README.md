@@ -25,6 +25,8 @@
 - [ ] experiment
     - [x] script which will reserve seats concurrently
     - [ ] alternative - wait for response and only then send next request
+    - [ ] stats from experiments
+    - [ ] check that payments and ticket renders are all correct
     - [x] check for correctness under heavy load
     - [x] write trigger/check for uniqueness of reserved seats
     - [x] different container for read and write path (CQRS) because due to writes reads become unresponsive due to queueing up requests on django

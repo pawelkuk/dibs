@@ -8,9 +8,9 @@ import requests
 @shared_task
 def screening_changed_notification(event: events.ScreeningChanged):
     print("request to read model service")
-    screening: models.Screening = models.Screening.objects.get(
-        screening_id=event.screening_id
-    )
+    screening: models.Screening = models.Screening.objects.prefetch_related(
+        "reservations", "reservations__reservation_seats"
+    ).get(screening_id=event.screening_id)
     screening_data = ScreeningSerializer().to_representation(screening)
     response = requests.post("http://read_model:3001/update", json=screening_data)
     if response.status_code != 200:

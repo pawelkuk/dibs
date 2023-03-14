@@ -15,13 +15,15 @@ Including another URLconf
 """
 from django.urls import path
 from booking.views import make_reservation, cancel_reservation, ScreeningViewSet
-from ticketing.views import render_ticket
-from paying.views import pay, refund
+from ticketing.views import render_ticket, TicketViewSet
+from paying.views import pay, refund, PaymentViewSet
 from api.views import dibs, dibs_two_phase_commit
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register(r"screenings", ScreeningViewSet, basename="screening")
+router.register(r"tickets", TicketViewSet, basename="tickets")
+router.register(r"payments", PaymentViewSet, basename="payments")
 
 urlpatterns = [
     path("make-reservation", view=make_reservation),
