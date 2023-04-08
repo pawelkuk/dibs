@@ -30,6 +30,7 @@ getState = async (backoff) => {
         })
         .catch((error) => console.log(error.message));
     });
+    setTimeout(() => getState(1000 /* ms */), 10000);
   } catch (error) {
     console.log(error);
     await sleep(backoff);
@@ -66,6 +67,7 @@ app.post("/update", (req, res) => {
   }
   return res.send({ status: "ok" });
 });
+
 io.on("connection", (socket) => {
   socket.on("screening", (screeningId) => {
     console.log(`user connected to ${screeningId}`);
@@ -74,10 +76,10 @@ io.on("connection", (socket) => {
   });
   console.log("a user connected");
   socket.on("disconnect", () => {
-    // socket.leave()
     console.log("user disconnected");
   });
 });
+
 emitter.on("state-change", (screeningId) => {
   console.log(`update front ${screeningId}`);
   io.sockets.in(screeningId).emit("state-change", state.get(screeningId));

@@ -14,3 +14,4 @@ watchdog
 requests
 djangorestframework
 django-cors-headers
+uwsgi

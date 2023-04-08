@@ -69,8 +69,8 @@ class Command(BaseCommand):
                 models.Seat.objects.create(
                     row=row, place=place, reservation=reservation, screening=screening
                 )
-            if random.random() < 0.5:
-                continue
+            # if random.random() < 0.5:
+            #     continue
             payment = Payment(
                 user_id=reservation.customer_id,
                 payment_id=uuid4(),
@@ -79,8 +79,8 @@ class Command(BaseCommand):
                 amount="9.99",
             )
             payment.save()
-            if random.random() < 0.5:
-                continue
+            # if random.random() < 0.5:
+            #     continue
 
             ticket = Ticket(
                 ticket_id=uuid4(),

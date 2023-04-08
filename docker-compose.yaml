@@ -24,6 +24,7 @@ services:
       - PYTHONDONTWRITEBYTECODE=1
     volumes:
       - ./src/:/src/
+      - ./resources/uwsgi.ini:/src/api/uwsgi.ini
     ports:
       - 5006:80
     stdin_open: true
@@ -42,6 +43,7 @@ services:
       - PYTHONDONTWRITEBYTECODE=1
     volumes:
       - ./src/:/src/
+      - ./resources/uwsgi.ini:/src/api/uwsgi.ini
     ports:
       - 5005:80
     stdin_open: true

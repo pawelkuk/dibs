@@ -1,6 +1,12 @@
 import { API_URL } from "./constants";
 import axios, { AxiosError } from "axios";
-import { DoubleBookedSeats, Screening, ScreeningDetail } from "./types";
+import {
+  DoubleBookedSeats,
+  Payment,
+  Screening,
+  ScreeningDetail,
+  Ticket,
+} from "./types";
 import { handleError } from "./utils";
 function Counter(array: string[]) {
   var count: { [key: string]: number } = {};
@@ -22,6 +28,52 @@ const getScreenings = async () => {
     handleError(error as AxiosError);
   }
 };
+
+const getPayments = async () => {
+  try {
+    const paymentsResponse = await axios.get<Payment[]>(`${API_URL}/payments/`);
+    return paymentsResponse.data;
+  } catch (error) {
+    handleError(error as AxiosError);
+  }
+};
+
+const getTickets = async () => {
+  try {
+    const ticketsResponse = await axios.get<Ticket[]>(`${API_URL}/tickets/`);
+    return ticketsResponse.data;
+  } catch (error) {
+    handleError(error as AxiosError);
+  }
+};
+
+function checkForInconsistentState(
+  screeningDetails: ScreeningDetail[],
+  paymentsDetails: Payment[],
+  ticketsDetails: Ticket[]
+) {
+  const screeningUsers = screeningDetails
+    .map((screening) => screening.reservations.map((r) => r.customer_id))
+    .flat();
+
+  const reservationUserMap: { [key: string]: string } = {};
+  screeningDetails.forEach((screening) => {
+    screening.reservations.forEach((r) => {
+      reservationUserMap[r.reservation_number] = r.customer_id;
+    });
+  });
+  const ticketUsers = ticketsDetails.map(
+    (t) => reservationUserMap[t.reservation_id]
+  );
+  const paymentUsers = paymentsDetails.map((p) => p.user_id);
+
+  const counter = Counter([...screeningUsers, ...ticketUsers, ...paymentUsers]);
+
+  let k: keyof typeof counter;
+  for (k in counter) if (counter[k] === 3) delete counter[k];
+
+  return counter;
+}
 
 const getScreeningDetails = async (screenings: Screening[]) => {
   return await Promise.all(
@@ -60,7 +112,24 @@ async function main() {
   const screeningDetails = (
     await getScreeningDetails(screeningsResponse)
   ).filter(notEmpty);
+  const paymentsDetails = await getPayments();
+  if (!paymentsDetails) {
+    console.log("no payments found");
+    return;
+  }
+  const ticketsDetails = await getTickets();
+  if (!ticketsDetails) {
+    console.log("no tickets found");
+    return;
+  }
   const doubleBooked = screeningDetails.map(findDoubleBooked);
   console.log(doubleBooked);
+
+  const inconsistentStateUsers = checkForInconsistentState(
+    screeningDetails,
+    paymentsDetails,
+    ticketsDetails
+  );
+  console.log(inconsistentStateUsers);
 }
 main();

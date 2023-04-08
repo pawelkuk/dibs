@@ -37,3 +37,16 @@ export type DoubleBookedSeats = {
   };
   movie: string;
 };
+
+export type Payment = {
+  payment_id: string;
+  user_id: string;
+  status: string;
+};
+
+export type Ticket = {
+  ticket_id: string;
+  reservation_id: string;
+  status: string;
+  ticket_url: string;
+};
