@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { API_URL } from "./constants";
 import { Options, Reservation, Screening, ScreeningDetail } from "./types";
 import { handleError } from "./utils";
+import { performance } from "perf_hooks";
 
 function sleep(ms: number) {
   return new Promise((resolve) => {
@@ -62,6 +63,8 @@ function makeReservationData(
 }
 
 async function main(options: Options) {
+  const successList: number[] = [];
+  const errorList: number[] = [];
   console.log("starting benchmark");
   for (let i = 0; i < options.iterations; i++) {
     console.log("next iter!");
@@ -69,7 +72,7 @@ async function main(options: Options) {
       const screeningsResponse = await axios.get<Screening[]>(
         `${API_URL}/screenings/`
       );
-      screeningsResponse.data.map(async (screening) => {
+      const reqs = screeningsResponse.data.map(async (screening) => {
         try {
           const screeningDetailResponse = await axios.get(
             `${API_URL}/screenings/${screening.screening_id}/`
@@ -84,29 +87,66 @@ async function main(options: Options) {
               screeningDetail,
               options.number
             );
-            reservationData.map(async (reservation) => {
+            const resReqs = reservationData.map(async (reservation) => {
               console.log(reservation.seats_data);
               console.log(options.mode);
+              let start = performance.now();
               try {
                 const res = await axios.post(
                   `${API_URL}/${options.mode}`,
                   reservation
                 );
+                let end = performance.now();
+                successList.push(end - start);
               } catch (error) {
+                let end = performance.now();
+                errorList.push(end - start);
                 handleError(error as AxiosError);
               }
               // console.log(reservation.seats_data);
             });
+            await Promise.all(resReqs);
           }
         } catch (error) {
           handleError(error as AxiosError);
         }
       });
+      await Promise.all(reqs);
     } catch (error) {
       handleError(error as AxiosError);
     }
     await sleep(options.delay);
   }
+  const successStats = computeStats(successList);
+  const errorStats = computeStats(errorList);
+  const totalStats = computeStats(successList.concat(errorList));
+  console.log("###### success stats ######");
+  console.log("avg: ", successStats[0]);
+  console.log("min: ", successStats[1]);
+  console.log("max: ", successStats[2]);
+  console.log("median: ", successStats[3]);
+  console.log("number of successes: ", successList.length);
+  console.log("###### error stats ######");
+  console.log("avg: ", errorStats[0]);
+  console.log("min: ", errorStats[1]);
+  console.log("max: ", errorStats[2]);
+  console.log("median: ", errorStats[3]);
+  console.log("number of errors: ", errorList.length);
+  console.log("###### total stats ######");
+  console.log("avg: ", totalStats[0]);
+  console.log("min: ", totalStats[1]);
+  console.log("max: ", totalStats[2]);
+  console.log("median: ", totalStats[3]);
+  console.log("number of requests: ", successList.length + errorList.length);
+}
+
+function computeStats(times: number[]) {
+  const total = times.reduce((a, b) => a + b, 0);
+  const avg = total / times.length;
+  const min = Math.min(...times);
+  const max = Math.max(...times);
+  const median = times.sort()[Math.floor(times.length / 2)];
+  return [avg, min, max, median] as const;
 }
 
 export default main;

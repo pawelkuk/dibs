@@ -4,7 +4,7 @@ import main from "./benchmark";
 const program = new Command()
   .addOption(
     new Option("-m, --mode <string>", "mode in which to run benchmark")
-      .default("2pc")
+      .default("dibs-two-phase-commit", "2pc")
       .choices(["saga", "2pc"])
       .argParser((value) => {
         if (value === "saga") {
