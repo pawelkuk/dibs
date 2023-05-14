@@ -14,6 +14,8 @@ const getSeats = () => {
   return seats.flat();
 };
 
+const Spinner = () => <div className="loader"></div>;
+
 function choose(choices) {
   var index = Math.floor(Math.random() * choices.length);
   return choices[index];
@@ -36,16 +38,19 @@ function ScreeningList(props) {
         console.log(error);
       });
   }, []);
-
-  return (
-    <ul>
-      {screeningList.map((obj) => (
-        <li key={obj.screening_id}>
-          <Link to={`/screenings/${obj.screening_id}`}>{obj.movie}</Link>
-        </li>
-      ))}
-    </ul>
-  );
+  const x =
+    screeningList.length > 0 ? (
+      <ul>
+        {screeningList.map((obj) => (
+          <li key={obj.screening_id}>
+            <Link to={`/screenings/${obj.screening_id}`}>{obj.movie}</Link>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <Spinner />
+    );
+  return <div>{x}</div>;
 }
 
 function SeatArea(props) {
