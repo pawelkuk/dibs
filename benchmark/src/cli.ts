@@ -30,9 +30,28 @@ const program = new Command()
       .argParser((value) => parseInt(value))
   )
   .addOption(
-    new Option("-i, --iterations <number>", "number of iterations to run")
-      .default(10)
+    new Option("-e, --error-margin <number>", "error margin for full screening")
+      .default(1)
       .argParser((value) => parseInt(value))
+  )
+  .addOption(
+    new Option(
+      "-N, --numbers-of-screenings <number>",
+      "number of screenings to fully book"
+    )
+      .default(1)
+      .argParser((value) => parseInt(value))
+  )
+  .addOption(
+    new Option(
+      "-i, --iterations <number>",
+      "number of iterations to run. 0 means infinite"
+    )
+      .default(10)
+      .argParser((value) => {
+        const val = parseInt(value);
+        return val === 0 ? Infinity : val;
+      })
   )
   .option("-v, --verbose", "verbose output", false)
   .parse(process.argv);

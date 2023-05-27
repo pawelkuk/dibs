@@ -91,3 +91,4 @@ class Command(BaseCommand):
             ticket.save()
 
         self.stdout.write("Data created 🍏")
+        self.screening = screening

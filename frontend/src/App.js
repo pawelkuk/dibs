@@ -38,19 +38,49 @@ function ScreeningList(props) {
         console.log(error);
       });
   }, []);
+  async function addScreening() {
+    const res = await axios
+      .post(`${API}/screenings/partially_booked/`)
+      .catch((error) => {
+        alert(error.message);
+      });
+    const newScreening = await res.data;
+    setScreeningList([...screeningList, newScreening]);
+  }
+  async function markAsFull(obj) {
+    await axios
+      .patch(`${API}/screenings/${obj.screening_id}/mark_as_full/`)
+      .catch((error) => {
+        alert(error.message);
+      });
+    setScreeningList(
+      screeningList.filter((s) => s.screening_id !== obj.screening_id)
+    );
+  }
+
   const x =
     screeningList.length > 0 ? (
       <ul>
         {screeningList.map((obj) => (
           <li key={obj.screening_id}>
-            <Link to={`/screenings/${obj.screening_id}`}>{obj.movie}</Link>
+            <Link className="child" to={`/screenings/${obj.screening_id}`}>
+              {obj.movie}
+            </Link>
+            <div onClick={(e) => markAsFull(obj)} className="child">
+              ❌
+            </div>
           </li>
         ))}
       </ul>
     ) : (
       <Spinner />
     );
-  return <div>{x}</div>;
+  return (
+    <>
+      <div onClick={(e) => addScreening()}>Add screening ➕</div>
+      <div className="listContainer">{x}</div>
+    </>
+  );
 }
 
 function SeatArea(props) {

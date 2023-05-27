@@ -7,6 +7,11 @@ h1 {
   margin: auto;
 }
 
+.listContainer {
+  display: flex;
+  justify-content: center;
+}
+
 .grid td {
   width: 30px;
   height: 20px;
@@ -56,4 +61,8 @@ li {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.child {
+  display: inline-block;
 }

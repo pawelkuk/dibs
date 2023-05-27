@@ -21,8 +21,15 @@ var program = new extra_typings_1.Command()
     .argParser(function (value) { return parseInt(value); }))
     .addOption(new extra_typings_1.Option("-n, --number <number>", "number of requests to send per iter")["default"](1)
     .argParser(function (value) { return parseInt(value); }))
-    .addOption(new extra_typings_1.Option("-i, --iterations <number>", "number of iterations to run")["default"](10)
+    .addOption(new extra_typings_1.Option("-e, --error-margin <number>", "error margin for full screening")["default"](1)
     .argParser(function (value) { return parseInt(value); }))
+    .addOption(new extra_typings_1.Option("-N, --numbers-of-screenings <number>", "number of screenings to fully book")["default"](1)
+    .argParser(function (value) { return parseInt(value); }))
+    .addOption(new extra_typings_1.Option("-i, --iterations <number>", "number of iterations to run. 0 means infinite")["default"](10)
+    .argParser(function (value) {
+    var val = parseInt(value);
+    return val === 0 ? Infinity : val;
+}))
     .option("-v, --verbose", "verbose output", false)
     .parse(process.argv);
 var options = program.opts();

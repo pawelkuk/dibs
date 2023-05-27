@@ -41,9 +41,18 @@ var uuid_1 = require("uuid");
 var constants_1 = require("./constants");
 var utils_1 = require("./utils");
 var perf_hooks_1 = require("perf_hooks");
+var fs_1 = require("fs");
 function sleep(ms) {
     return new Promise(function (resolve) {
         setTimeout(resolve, ms);
+    });
+}
+function createNewScreening() {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            axios_1["default"].post(constants_1.API_URL + "/screenings/", {});
+            return [2 /*return*/];
+        });
     });
 }
 function removeDuplicates(items) {
@@ -91,7 +100,7 @@ function makeReservationData(screening, n) {
 }
 function main(options) {
     return __awaiter(this, void 0, void 0, function () {
-        var successList, errorList, i, screeningsResponse, reqs, error_1, successStats, errorStats, totalStats;
+        var successList, errorList, expStart, movieTitles, seatsReserved, j, i, screeningsResponse, resps, res, reqs, error_1, successStats, errorStats, totalStats;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -99,84 +108,140 @@ function main(options) {
                     successList = [];
                     errorList = [];
                     console.log("starting benchmark");
-                    i = 0;
+                    expStart = perf_hooks_1.performance.now();
+                    movieTitles = [];
+                    seatsReserved = false;
+                    j = 0;
                     _a.label = 1;
                 case 1:
-                    if (!(i < options.iterations)) return [3 /*break*/, 9];
-                    console.log("next iter!");
+                    if (!(j < options.numbersOfScreenings)) return [3 /*break*/, 15];
+                    console.log("Start movie " + (j + 1) + "!");
+                    i = 0;
                     _a.label = 2;
                 case 2:
-                    _a.trys.push([2, 5, , 6]);
-                    return [4 /*yield*/, axios_1["default"].get(constants_1.API_URL + "/screenings/")];
+                    if (!(i < options.iterations)) return [3 /*break*/, 13];
+                    console.log("next iter!");
+                    _a.label = 3;
                 case 3:
+                    _a.trys.push([3, 9, , 10]);
+                    return [4 /*yield*/, axios_1["default"].get(constants_1.API_URL + "/screenings/")];
+                case 4:
                     screeningsResponse = _a.sent();
+                    if (!seatsReserved) return [3 /*break*/, 7];
+                    resps = screeningsResponse.data.map(function (screening) { return __awaiter(_this, void 0, void 0, function () {
+                        var resp;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, axios_1["default"].patch(constants_1.API_URL + "/screenings/" + screening.screening_id + "/mark_as_full/")];
+                                case 1:
+                                    resp = _a.sent();
+                                    if (resp.status !== 200) {
+                                        throw Error("Could not mark screening as full! Debug :(");
+                                    }
+                                    return [2 /*return*/];
+                            }
+                        });
+                    }); });
+                    return [4 /*yield*/, Promise.all(resps)];
+                case 5:
+                    _a.sent();
+                    return [4 /*yield*/, axios_1["default"].post(constants_1.API_URL + "/screenings/partially_booked/")];
+                case 6:
+                    res = _a.sent();
+                    if (res.status !== 200) {
+                        throw Error("Could not create new screening! Debug :(");
+                    }
+                    seatsReserved = false;
+                    return [3 /*break*/, 13];
+                case 7:
                     reqs = screeningsResponse.data.map(function (screening) { return __awaiter(_this, void 0, void 0, function () {
-                        var screeningDetailResponse, screeningDetail, reservationData, error_2;
+                        var screeningDetailResponse, screeningDetail, reservationData, resReqs, error_2;
                         var _this = this;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    _a.trys.push([0, 2, , 3]);
+                                    _a.trys.push([0, 5, , 6]);
+                                    movieTitles.push(screening);
                                     return [4 /*yield*/, axios_1["default"].get(constants_1.API_URL + "/screenings/" + screening.screening_id + "/")];
                                 case 1:
                                     screeningDetailResponse = _a.sent();
                                     screeningDetail = screeningDetailResponse.data;
                                     console.log(screeningDetail.screening_id, screeningDetail.free_seats.length);
-                                    if (screeningDetail.free_seats) {
-                                        reservationData = makeReservationData(screeningDetail, options.number);
-                                        reservationData.map(function (reservation) { return __awaiter(_this, void 0, void 0, function () {
-                                            var start, res, end, error_3, end;
-                                            return __generator(this, function (_a) {
-                                                switch (_a.label) {
-                                                    case 0:
-                                                        console.log(reservation.seats_data);
-                                                        console.log(options.mode);
-                                                        start = perf_hooks_1.performance.now();
-                                                        _a.label = 1;
-                                                    case 1:
-                                                        _a.trys.push([1, 3, , 4]);
-                                                        return [4 /*yield*/, axios_1["default"].post(constants_1.API_URL + "/" + options.mode, reservation)];
-                                                    case 2:
-                                                        res = _a.sent();
-                                                        end = perf_hooks_1.performance.now();
-                                                        successList.push(end - start);
-                                                        return [3 /*break*/, 4];
-                                                    case 3:
-                                                        error_3 = _a.sent();
-                                                        end = perf_hooks_1.performance.now();
-                                                        utils_1.handleError(error_3);
-                                                        return [3 /*break*/, 4];
-                                                    case 4: return [2 /*return*/];
-                                                }
-                                            });
-                                        }); });
-                                    }
-                                    return [3 /*break*/, 3];
+                                    if (!(screeningDetail.free_seats.length > options.errorMargin)) return [3 /*break*/, 3];
+                                    reservationData = makeReservationData(screeningDetail, options.number);
+                                    resReqs = reservationData.map(function (reservation) { return __awaiter(_this, void 0, void 0, function () {
+                                        var start, res, end, error_3, end;
+                                        return __generator(this, function (_a) {
+                                            switch (_a.label) {
+                                                case 0:
+                                                    console.log(reservation.seats_data);
+                                                    console.log(options.mode);
+                                                    start = perf_hooks_1.performance.now();
+                                                    _a.label = 1;
+                                                case 1:
+                                                    _a.trys.push([1, 3, , 4]);
+                                                    return [4 /*yield*/, axios_1["default"].post(constants_1.API_URL + "/" + options.mode, reservation)];
+                                                case 2:
+                                                    res = _a.sent();
+                                                    end = perf_hooks_1.performance.now();
+                                                    successList.push({
+                                                        value: end - start,
+                                                        t: end - expStart
+                                                    });
+                                                    return [3 /*break*/, 4];
+                                                case 3:
+                                                    error_3 = _a.sent();
+                                                    end = perf_hooks_1.performance.now();
+                                                    errorList.push({
+                                                        value: end - start,
+                                                        t: end - expStart
+                                                    });
+                                                    utils_1.handleError(error_3);
+                                                    return [3 /*break*/, 4];
+                                                case 4: return [2 /*return*/];
+                                            }
+                                        });
+                                    }); });
+                                    return [4 /*yield*/, Promise.all(resReqs)];
                                 case 2:
+                                    _a.sent();
+                                    return [3 /*break*/, 4];
+                                case 3:
+                                    seatsReserved = true;
+                                    _a.label = 4;
+                                case 4: return [3 /*break*/, 6];
+                                case 5:
                                     error_2 = _a.sent();
                                     utils_1.handleError(error_2);
-                                    return [3 /*break*/, 3];
-                                case 3: return [2 /*return*/];
+                                    return [3 /*break*/, 6];
+                                case 6: return [2 /*return*/];
                             }
                         });
                     }); });
                     return [4 /*yield*/, Promise.all(reqs)];
-                case 4:
-                    _a.sent();
-                    return [3 /*break*/, 6];
-                case 5:
-                    error_1 = _a.sent();
-                    debugger;
-                    utils_1.handleError(error_1);
-                    return [3 /*break*/, 6];
-                case 6: return [4 /*yield*/, sleep(options.delay)];
-                case 7:
-                    _a.sent();
-                    _a.label = 8;
                 case 8:
-                    i++;
-                    return [3 /*break*/, 1];
+                    _a.sent();
+                    return [3 /*break*/, 10];
                 case 9:
+                    error_1 = _a.sent();
+                    utils_1.handleError(error_1);
+                    return [3 /*break*/, 10];
+                case 10: return [4 /*yield*/, sleep(options.delay)];
+                case 11:
+                    _a.sent();
+                    _a.label = 12;
+                case 12:
+                    i++;
+                    return [3 /*break*/, 2];
+                case 13:
+                    console.log("Movie " + (j + 1) + " finished!");
+                    _a.label = 14;
+                case 14:
+                    j++;
+                    return [3 /*break*/, 1];
+                case 15:
+                    console.log({ movieTitles: movieTitles });
+                    writeDataToFile(successList, errorList, movieTitles[0], options);
                     successStats = computeStats(successList);
                     errorStats = computeStats(errorList);
                     totalStats = computeStats(successList.concat(errorList));
@@ -204,11 +269,24 @@ function main(options) {
     });
 }
 function computeStats(times) {
-    var total = times.reduce(function (a, b) { return a + b; }, 0);
+    var total = times.reduce(function (a, b) { return a + b.value; }, 0);
     var avg = total / times.length;
-    var min = Math.min.apply(Math, times);
-    var max = Math.max.apply(Math, times);
-    var median = times.sort()[Math.floor(times.length / 2)];
+    var min = Math.min.apply(Math, times.map(function (t) { return t.value; }));
+    var max = Math.max.apply(Math, times.map(function (t) { return t.value; }));
+    var median = times.sort(function (a, b) { return a.value - b.value; })[Math.floor(times.length / 2)];
     return [avg, min, max, median];
+}
+function writeDataToFile(successData, errorData, screening, options) {
+    var fName = getFileName(screening, options);
+    var headers = "time,reservation_duration,was_successful\n";
+    var csv = headers +
+        successData.map(function (d) { return d.t + "," + d.value + "," + true; }).join("\n") +
+        "\n" +
+        errorData.map(function (d) { return d.t + "," + d.value + "," + false; }).join("\n");
+    console.log(csv);
+    fs_1["default"].writeFileSync("/data/" + fName, csv);
+}
+function getFileName(screening, options) {
+    return screening.title + "_" + options.mode + "_" + options.number + "_" + options.iterations + ".csv";
 }
 exports["default"] = main;

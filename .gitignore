@@ -4,3 +4,4 @@ celerybeat-schedule
 .vscode/
 !.gitkeep
 frontend/node_modules/
+experiments/*

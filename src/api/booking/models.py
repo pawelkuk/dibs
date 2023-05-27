@@ -52,6 +52,7 @@ class Screening(models.Model):
     )
     theatre = models.ForeignKey(Theatre, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
+    is_full = models.BooleanField(default=False)
 
     def to_domain(self) -> model.Screening:
         reservations = (r.to_domain() for r in self.reservations.all())

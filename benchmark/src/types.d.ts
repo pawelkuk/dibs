@@ -18,6 +18,8 @@ export type Options = {
   number: number;
   iterations: number;
   verbose: boolean;
+  errorMargin: number;
+  numbersOfScreenings: number;
 };
 export type ScreeningDetail = {
   screening_id: string;
@@ -49,4 +51,9 @@ export type Ticket = {
   reservation_id: string;
   status: string;
   ticket_url: string;
+};
+
+export type DataPoint = {
+  t: number;
+  value: number;
 };

@@ -167,9 +167,10 @@ services:
 
   benchmark:
     build: ./benchmark
-    entrypoint: sleep 99999
+    entrypoint: tail -f /dev/null
     volumes:
       - ./benchmark:/benchmark
+      - ./experiments:/data
     depends_on:
       - app
     stdin_open: true

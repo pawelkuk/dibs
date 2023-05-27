@@ -16,4 +16,5 @@ CMD python /src/api/wait_for_postgres.py && \
     python /src/api/manage.py migrate --database booking && \
     python /src/api/manage.py migrate --database paying && \
     python /src/api/manage.py migrate --database ticketing && \
-    uwsgi --ini /src/api/uwsgi.ini
+    # uwsgi --ini /src/api/uwsgi.ini
+    python /src/api/manage.py runserver 0.0.0.0:80

@@ -22,9 +22,11 @@
     - [x] setup rabbitmq + celery
     - [x] setup auto-reload for celery
     - [x] write controller (saga workflow) as celery task/multiple tasks
-- [ ] experiment
+- [x] experiment
+    - [x] save time of reservation for further analysis
+    - [x] save duration of the reservation for further analysis
     - [x] script which will reserve seats concurrently
-    - [ ] alternative - wait for response and only then send next request
+    - [x] alternative - wait for response and only then send next request
     - [x] stats from experiments
         - [x] avg time to reserve seats
         - [x] number of requests which failed
@@ -41,3 +43,26 @@
 - [x] distributed transactions approach
 - [x] use uwsgi instead of django dev server
 - [x] check periodically for updates in read model service
+- [x] add spinner to FE
+- [x] remove screening endpoint (mark as full)
+- [x] update benchmarking script to creating/deleting screenings
+- [ ] gather data for thesis
+    - [ ] high load
+        - [ ] avg, std dev and distribution of time to reserve all seats (or almost all)
+        - [ ] avg, std dev and distribution of time to complete a reservation
+        - [ ] avg, std dev and distribution of success/failure rate (status code >= 400)
+    - [ ] small load
+        - [ ] avg, std dev and distribution of time to reserve all seats (or almost all)
+        - [ ] avg, std dev and distribution of time to complete a reservation
+        - [ ] avg, std dev and distribution of success/failure rate (status code >= 400)
+- [ ] write thesis
+    - [ ] abstract
+    - [ ] introduction
+    - [ ] related work
+    - [ ] system design
+    - [ ] implementation
+    - [ ] evaluation
+    - [ ] conclusion
+    - [ ] bibliography
+    - [ ] acknowledgements
+    - [ ] appendix
