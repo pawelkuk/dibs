@@ -40,7 +40,7 @@ function ScreeningList(props) {
   }, []);
   async function addScreening() {
     const res = await axios
-      .post(`${API}/screenings/partially_booked/`)
+      .post(`${API}/screenings/partially_booked/`, { clean: true })
       .catch((error) => {
         alert(error.message);
       });

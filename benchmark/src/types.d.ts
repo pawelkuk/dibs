@@ -1,7 +1,8 @@
 export type Screening = {
   screening_id: string;
-  title: string;
+  movie: string;
 };
+
 export type Currency = "GBP" | "USD" | "PLN";
 export type Reservation = {
   customer_id: string;

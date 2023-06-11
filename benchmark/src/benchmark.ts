@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { API_URL } from "./constants";
+import slugify from "slugify";
 import {
   Options,
   Reservation,
@@ -99,7 +100,8 @@ async function main(options: Options) {
           });
           await Promise.all(resps);
           const res = await axios.post(
-            `${API_URL}/screenings/partially_booked/`
+            `${API_URL}/screenings/partially_booked/`,
+            { clean: true }
           );
           if (res.status !== 200) {
             throw Error("Could not create new screening! Debug :(");
@@ -217,7 +219,8 @@ function writeDataToFile(
   fs.writeFileSync(`/data/${fName}`, csv);
 }
 function getFileName(screening: Screening, options: Options) {
-  return `${screening.title}_${options.mode}_${options.number}_${options.iterations}.csv`;
+  const movie = slugify(screening.movie);
+  return `${movie}_${options.mode}_${options.number}_${options.iterations}.csv`;
 }
 
 export default main;

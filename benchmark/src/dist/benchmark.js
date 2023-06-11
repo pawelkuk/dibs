@@ -39,6 +39,7 @@ exports.__esModule = true;
 var axios_1 = require("axios");
 var uuid_1 = require("uuid");
 var constants_1 = require("./constants");
+var slugify_1 = require("slugify");
 var utils_1 = require("./utils");
 var perf_hooks_1 = require("perf_hooks");
 var fs_1 = require("fs");
@@ -145,7 +146,7 @@ function main(options) {
                     return [4 /*yield*/, Promise.all(resps)];
                 case 5:
                     _a.sent();
-                    return [4 /*yield*/, axios_1["default"].post(constants_1.API_URL + "/screenings/partially_booked/")];
+                    return [4 /*yield*/, axios_1["default"].post(constants_1.API_URL + "/screenings/partially_booked/", { clean: true })];
                 case 6:
                     res = _a.sent();
                     if (res.status !== 200) {
@@ -287,6 +288,7 @@ function writeDataToFile(successData, errorData, screening, options) {
     fs_1["default"].writeFileSync("/data/" + fName, csv);
 }
 function getFileName(screening, options) {
-    return screening.title + "_" + options.mode + "_" + options.number + "_" + options.iterations + ".csv";
+    var movie = slugify_1["default"](screening.movie);
+    return movie + "_" + options.mode + "_" + options.number + "_" + options.iterations + ".csv";
 }
 exports["default"] = main;

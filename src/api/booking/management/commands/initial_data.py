@@ -54,6 +54,9 @@ class Command(BaseCommand):
         screening = models.Screening.objects.create(
             theatre=theatre, movie=random.choice(movies)
         )
+        self.screening = screening
+        if options.get("clean"):
+            return
         seats = seat_generator()
         while True:
             reservation = models.Reservation()
@@ -91,4 +94,3 @@ class Command(BaseCommand):
             ticket.save()
 
         self.stdout.write("Data created 🍏")
-        self.screening = screening

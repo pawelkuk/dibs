@@ -88,7 +88,7 @@ class ScreeningViewSet(viewsets.ReadOnlyModelViewSet):
 
         try:
             cmd = initial_data.Command()
-            cmd.handle()
+            cmd.handle(clean=request.data.get("clean", False))
             screening = cmd.screening
             return Response(
                 {
