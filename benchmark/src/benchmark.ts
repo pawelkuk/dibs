@@ -75,14 +75,14 @@ function makeReservationData(
 }
 
 async function main(options: Options) {
-  const successList: DataPoint[] = [];
-  const errorList: DataPoint[] = [];
   console.log("starting benchmark");
-  const expStart = performance.now();
-  const movieTitles: Screening[] = [];
-  let seatsReserved = false;
   for (let j = 0; j < options.numbersOfScreenings; j++) {
     console.log(`Start movie ${j + 1}!`);
+    const successList: DataPoint[] = [];
+    const errorList: DataPoint[] = [];
+    const expStart = performance.now();
+    const movieTitles: Screening[] = [];
+    let seatsReserved = false;
     for (let i = 0; i < options.iterations; i++) {
       console.log("next iter!");
       try {
@@ -164,31 +164,31 @@ async function main(options: Options) {
       }
       await sleep(options.delay);
     }
+    writeDataToFile(successList, errorList, movieTitles[0], options, expStart);
+    console.log({ movieTitles });
+    const successStats = computeStats(successList);
+    const errorStats = computeStats(errorList);
+    const totalStats = computeStats(successList.concat(errorList));
+    console.log("###### success stats ######");
+    console.log("avg: ", successStats[0]);
+    console.log("min: ", successStats[1]);
+    console.log("max: ", successStats[2]);
+    console.log("median: ", successStats[3]);
+    console.log("number of successes: ", successList.length);
+    console.log("###### error stats ######");
+    console.log("avg: ", errorStats[0]);
+    console.log("min: ", errorStats[1]);
+    console.log("max: ", errorStats[2]);
+    console.log("median: ", errorStats[3]);
+    console.log("number of errors: ", errorList.length);
+    console.log("###### total stats ######");
+    console.log("avg: ", totalStats[0]);
+    console.log("min: ", totalStats[1]);
+    console.log("max: ", totalStats[2]);
+    console.log("median: ", totalStats[3]);
+    console.log("number of requests: ", successList.length + errorList.length);
     console.log(`Movie ${j + 1} finished!`);
   }
-  console.log({ movieTitles });
-  writeDataToFile(successList, errorList, movieTitles[0], options);
-  const successStats = computeStats(successList);
-  const errorStats = computeStats(errorList);
-  const totalStats = computeStats(successList.concat(errorList));
-  console.log("###### success stats ######");
-  console.log("avg: ", successStats[0]);
-  console.log("min: ", successStats[1]);
-  console.log("max: ", successStats[2]);
-  console.log("median: ", successStats[3]);
-  console.log("number of successes: ", successList.length);
-  console.log("###### error stats ######");
-  console.log("avg: ", errorStats[0]);
-  console.log("min: ", errorStats[1]);
-  console.log("max: ", errorStats[2]);
-  console.log("median: ", errorStats[3]);
-  console.log("number of errors: ", errorList.length);
-  console.log("###### total stats ######");
-  console.log("avg: ", totalStats[0]);
-  console.log("min: ", totalStats[1]);
-  console.log("max: ", totalStats[2]);
-  console.log("median: ", totalStats[3]);
-  console.log("number of requests: ", successList.length + errorList.length);
 }
 
 function computeStats(times: DataPoint[]) {
@@ -206,9 +206,10 @@ function writeDataToFile(
   successData: DataPoint[],
   errorData: DataPoint[],
   screening: Screening,
-  options: Options
+  options: Options,
+  expStart: number
 ) {
-  const fName = getFileName(screening, options);
+  const fName = getFileName(screening, options, expStart);
   const headers = "time,reservation_duration,was_successful\n";
   const csv =
     headers +
@@ -218,9 +219,11 @@ function writeDataToFile(
   console.log(csv);
   fs.writeFileSync(`/data/${fName}`, csv);
 }
-function getFileName(screening: Screening, options: Options) {
+function getFileName(screening: Screening, options: Options, expStart: number) {
   const movie = slugify(screening.movie);
-  return `${movie}_${options.mode}_${options.number}_${options.iterations}.csv`;
+  return `${Math.floor(expStart)}_${movie}_${options.mode}_${
+    options.number
+  }.csv`;
 }
 
 export default main;
