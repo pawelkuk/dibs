@@ -10,3 +10,4 @@ reset_db:
 	docker-compose up -d
 clean:
 	rm ./experiments/*.csv
+	rm ./graphs/*.png
