@@ -39,8 +39,81 @@ fn main() {
     for experiment in &experiments {
         let e = extract_experiment_data(experiment.clone());
         graph_reservations(e.clone(), 30);
+        graph_reservations_in_time(e.clone());
         exp_with_data.push(e);
     }
+}
+
+fn graph_reservations_in_time(experiment: Experiment) -> Result<(), Box<dyn std::error::Error>> {
+    let file_name: String = format!("graphs/scatter-{}.png", experiment.csv_file);
+    let root_area = BitMapBackend::new(file_name.as_str(), (600, 400)).into_drawing_area();
+    root_area.fill(&WHITE)?;
+    let max = experiment
+        .reservations
+        .iter()
+        .reduce(|a, b| if a.time > b.time { a } else { b })
+        .unwrap()
+        .time;
+    let min = experiment
+        .reservations
+        .iter()
+        .reduce(|a, b| if a.time < b.time { a } else { b })
+        .unwrap()
+        .time;
+    let reservation_duration_max = experiment
+        .reservations
+        .iter()
+        .reduce(|a, b| {
+            if a.reservation_duration > b.reservation_duration {
+                a
+            } else {
+                b
+            }
+        })
+        .unwrap()
+        .reservation_duration as i32;
+    let reservation_duration_min = experiment
+        .reservations
+        .iter()
+        .reduce(|a, b| {
+            if a.reservation_duration < b.reservation_duration {
+                a
+            } else {
+                b
+            }
+        })
+        .unwrap()
+        .reservation_duration as i32;
+
+    let mut ctx = ChartBuilder::on(&root_area)
+        .set_label_area_size(LabelAreaPosition::Left, 40)
+        .set_label_area_size(LabelAreaPosition::Bottom, 40)
+        .caption("Scatter Demo", ("sans-serif", 40))
+        .build_cartesian_2d(
+            -(min as i32)..(max as i32),
+            -reservation_duration_min..reservation_duration_max,
+        )?;
+
+    ctx.configure_mesh().draw()?;
+
+    ctx.draw_series(
+        experiment
+            .reservations
+            .iter()
+            .filter(|res| res.was_successful)
+            .map(|point| (point.time as i32, point.reservation_duration as i32))
+            .map(|point| TriangleMarker::new(point, 5, GREEN)),
+    )?;
+
+    ctx.draw_series(
+        experiment
+            .reservations
+            .iter()
+            .filter(|res| !res.was_successful)
+            .map(|point| (point.time as i32, point.reservation_duration as i32))
+            .map(|point| Circle::new(point, 5, RED)),
+    )?;
+    Ok(())
 }
 
 fn get_resolution_and_max(experiment: Experiment, buckets: usize) -> (f64, f64) {
