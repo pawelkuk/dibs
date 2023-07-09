@@ -27,14 +27,11 @@ struct Reservation {
 }
 
 fn main() {
-    println!("Hello, world!");
     let csvs = find_all_csv_files();
     if csvs.is_empty() {
         println!("No csv files found")
     }
     let experiments = extract_info_from(csvs);
-    println!("{:?}", experiments);
-
     let mut exp_with_data = Vec::new();
     for experiment in &experiments {
         let e = extract_experiment_data(experiment.clone());
@@ -94,7 +91,7 @@ fn graph_reservations_in_time(experiment: Experiment) -> Result<(), Box<dyn std:
     let mut ctx = ChartBuilder::on(&root_area)
         .set_label_area_size(LabelAreaPosition::Left, 40)
         .set_label_area_size(LabelAreaPosition::Bottom, 40)
-        .caption("Scatter Demo", ("sans-serif", 40))
+        .caption("Reservations in time (ms)", ("sans-serif", 40))
         .build_cartesian_2d(
             -(min as i32)..(max as i32),
             -reservation_duration_min..reservation_duration_max,
@@ -152,7 +149,6 @@ fn extract_distribution(
         let bucket = (reservation.reservation_duration / resolution) as usize;
         distribution[bucket] += 1;
     }
-    println!("{:?}", distribution);
     distribution
 }
 
@@ -235,7 +231,6 @@ fn extract_experiment_data(mut experiment: Experiment) -> Experiment {
     let mut rdr = csv::Reader::from_path(path).unwrap();
     for result in rdr.deserialize() {
         let record: Reservation = result.unwrap();
-        println!("{:?}", record);
         experiment.reservations.push(record);
     }
     experiment
