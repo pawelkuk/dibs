@@ -38,8 +38,14 @@ fn main() {
     let mut exp_with_data = Vec::new();
     for experiment in &experiments {
         let e = extract_experiment_data(experiment.clone());
-        graph_reservations(e.clone(), 30);
-        graph_reservations_in_time(e.clone());
+        match graph_reservations(e.clone(), 30) {
+            Ok(_) => println!("Graphed {}", e.csv_file),
+            Err(e) => println!("Error: {}", e),
+        }
+        match graph_reservations_in_time(e.clone()) {
+            Ok(_) => println!("Graphed {}", e.csv_file),
+            Err(e) => println!("Error: {}", e),
+        }
         exp_with_data.push(e);
     }
 }
