@@ -47,15 +47,34 @@
 - [x] add spinner to FE
 - [x] remove screening endpoint (mark as full)
 - [x] update benchmarking script to creating/deleting screenings
-- [ ] gather data for thesis
+- [x] gather data for thesis
+- [ ] visualize data
   - [ ] high load
-    - [ ] avg, std dev and distribution of time to reserve all seats (or almost all)
-    - [ ] avg, std dev and distribution of time to complete a reservation
-    - [ ] avg, std dev and distribution of success/failure rate (status code >= 400)
+    - [ ] time to reserve all seats (or almost all)
+      - [ ] avg
+      - [ ] std dev
+      - [ ] distribution
+    - [ ] time to complete a reservation
+      - [ ] avg
+      - [ ] std dev
+      - [x] distribution
+    - [ ] success/failure rate (status code >= 400)
+      - [ ] avg
+      - [ ] std dev
+      - [ ] distribution
   - [ ] small load
-    - [ ] avg, std dev and distribution of time to reserve all seats (or almost all)
-    - [ ] avg, std dev and distribution of time to complete a reservation
-    - [ ] avg, std dev and distribution of success/failure rate (status code >= 400)
+    - [ ] time to reserve all seats (or almost all)
+      - [ ] avg
+      - [ ] std dev
+      - [ ] distribution
+    - [ ] time to complete a reservation
+      - [ ] avg
+      - [ ] std dev
+      - [x] distribution
+    - [ ] success/failure rate (status code >= 400)
+      - [ ] avg
+      - [ ] std dev
+      - [ ] distribution
 - [ ] write thesis
   - [ ] abstract
   - [ ] introduction

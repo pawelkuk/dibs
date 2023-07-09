@@ -1,4 +1,5 @@
 use plotters::prelude::*;
+use std::collections::{HashMap, HashSet};
 use std::error::Error;
 use std::fs::read_dir;
 
@@ -17,6 +18,14 @@ struct Experiment {
     concurrent_requests: u32,
     reservations: Vec<Reservation>,
     path: String,
+}
+
+struct ExperimentResult {
+    concurrent_load: u32,
+    avg_exp_time_ms: f64,
+    std_dev_exp_time_ms: f64,
+    avg_reservation_time_ms: f64,
+    std_dev_reservation_time_ms: f64,
 }
 
 #[derive(Debug, serde::Deserialize, Clone)]
@@ -45,6 +54,35 @@ fn main() {
         }
         exp_with_data.push(e);
     }
+    let load_values = uniq_concurrency_values(&exp_with_data);
+
+    let divided_exps = divide_experiments_into_buckets_by_load(exp_with_data, load_values);
+}
+
+fn divide_experiments_into_buckets_by_load(
+    exp_with_data: Vec<Experiment>,
+    load_values: Vec<u32>,
+) -> HashMap<u32, Vec<Experiment>> {
+    load_values
+        .into_iter()
+        .map(|load| {
+            let v = exp_with_data
+                .clone()
+                .into_iter()
+                .filter(|exp| exp.concurrent_requests == load)
+                .collect();
+            (load, v)
+        })
+        .collect::<HashMap<u32, Vec<Experiment>>>()
+}
+
+fn uniq_concurrency_values(exp_with_data: &[Experiment]) -> Vec<u32> {
+    exp_with_data
+        .iter()
+        .map(|exp| exp.concurrent_requests)
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect::<Vec<u32>>()
 }
 
 fn graph_reservations_in_time(experiment: Experiment) -> Result<(), Box<dyn std::error::Error>> {
