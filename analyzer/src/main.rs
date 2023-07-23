@@ -57,6 +57,69 @@ fn main() {
     let load_values = uniq_concurrency_values(&exp_with_data);
 
     let divided_exps = divide_experiments_into_buckets_by_load(exp_with_data, load_values);
+
+    calculate_statistics(divided_exps);
+}
+
+fn calculate_statistics(data: HashMap<u32, Vec<Experiment>>) -> Vec<ExperimentResult> {
+    data.into_iter()
+        .map(|(concurrent_load, exps)| {
+            let sum_of_all_reservations = exps.clone().into_iter().fold(0.0, |acc, e| {
+                acc + e
+                    .reservations
+                    .into_iter()
+                    .fold(0.0, |acc, r| acc + r.reservation_duration)
+            });
+            let n_of_all_reservations = exps
+                .clone()
+                .into_iter()
+                .fold(0.0, |acc, e| acc + e.reservations.len() as f64);
+            let n_of_all_experiments = exps.len();
+            let avg_reservation_time_ms = sum_of_all_reservations / n_of_all_reservations;
+            let sum_of_all_exp_times = exps.clone().into_iter().fold(0.0, |acc, e| {
+                acc + e.reservations.into_iter().fold(0.0, |acc, r| {
+                    let new_val = r.time + r.reservation_duration;
+                    if new_val > acc {
+                        new_val
+                    } else {
+                        acc
+                    }
+                })
+            });
+            let avg_exp_time_ms = sum_of_all_exp_times / n_of_all_experiments as f64;
+            let sum_of_all_reservations_squared = exps.clone().into_iter().fold(0.0, |acc, e| {
+                acc + e
+                    .reservations
+                    .into_iter()
+                    .fold(0.0, |acc, r| acc + r.reservation_duration.powi(2))
+            });
+            let avg_reservation_time_squared =
+                sum_of_all_reservations_squared / n_of_all_reservations;
+
+            let std_dev_reservation_time_ms =
+                (avg_reservation_time_squared - avg_reservation_time_ms.powi(2)).sqrt();
+
+            let sum_of_all_exp_times_squared = exps.into_iter().fold(0.0, |acc, e| {
+                acc + e.reservations.into_iter().fold(0.0, |acc, r| {
+                    let new_val = (r.time + r.reservation_duration).powi(2);
+                    if new_val > acc {
+                        new_val
+                    } else {
+                        acc
+                    }
+                })
+            });
+            let avg_exp_time_squared = sum_of_all_exp_times_squared / n_of_all_experiments as f64;
+            let std_dev_exp_time_ms = (avg_exp_time_squared - avg_exp_time_ms.powi(2)).sqrt();
+            ExperimentResult {
+                concurrent_load,
+                avg_reservation_time_ms,
+                avg_exp_time_ms,
+                std_dev_exp_time_ms,
+                std_dev_reservation_time_ms,
+            }
+        })
+        .collect::<Vec<ExperimentResult>>()
 }
 
 fn divide_experiments_into_buckets_by_load(
