@@ -69,7 +69,8 @@ fn main() {
 }
 
 fn calculate_statistics(data: HashMap<u32, Vec<Experiment>>) -> Vec<ExperimentResult> {
-    data.into_iter()
+    let mut res = data
+        .into_iter()
         .map(|(concurrent_load, exps)| {
             let sum_of_all_reservations = exps.clone().into_iter().fold(0.0, |acc, e| {
                 acc + e
@@ -149,7 +150,9 @@ fn calculate_statistics(data: HashMap<u32, Vec<Experiment>>) -> Vec<ExperimentRe
                 std_dev_success_rate,
             }
         })
-        .collect::<Vec<ExperimentResult>>()
+        .collect::<Vec<ExperimentResult>>();
+    res.sort_by(|a, b| a.concurrent_load.partial_cmp(&b.concurrent_load).unwrap());
+    res
 }
 
 fn divide_experiments_into_buckets_by_load(
