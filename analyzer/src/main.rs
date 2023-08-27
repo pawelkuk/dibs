@@ -215,10 +215,12 @@ fn get_bounding_box(
 
 fn graph_stats(stats: Vec<ExperimentResult>) -> Result<(), Box<dyn std::error::Error>> {
     let file_name: String = "graphs/stats.png".to_string();
-    let root_area = BitMapBackend::new(file_name.as_str(), (600, 800)).into_drawing_area();
+    let root_area = BitMapBackend::new(file_name.as_str(), (600, 1200)).into_drawing_area();
     root_area.fill(&WHITE)?;
-    let (upper, lower_tmp) = root_area.split_vertically((64).percent());
-    let (_, lower) = lower_tmp.split_vertically((10).percent());
+    let (upper, lower_tmp) = root_area.split_vertically((75).percent());
+    let (_, lower_tmp_2) = lower_tmp.split_vertically((10).percent());
+    let (lower, lower_tmp_3) = lower_tmp_2.split_vertically((64).percent());
+    let (_, bottom) = lower_tmp_3.split_vertically((10).percent());
     let avg_exp_bounding_box = get_bounding_box(
         stats.clone(),
         |exp| exp.avg_exp_time_ms - exp.std_dev_exp_time_ms,
@@ -280,6 +282,40 @@ fn graph_stats(stats: Vec<ExperimentResult>) -> Result<(), Box<dyn std::error::E
             exp.avg_reservation_time_ms - exp.std_dev_reservation_time_ms,
             exp.avg_reservation_time_ms,
             exp.avg_reservation_time_ms + exp.std_dev_reservation_time_ms,
+            BLUE.filled(),
+            20,
+        )
+    }))?;
+
+    let success_rate_bounding_box = get_bounding_box(
+        stats.clone(),
+        |exp| exp.avg_success_rate - exp.std_dev_success_rate,
+        |exp| exp.avg_success_rate + exp.std_dev_success_rate,
+    );
+
+    let mut ctx_bottom = ChartBuilder::on(&bottom)
+        .set_label_area_size(LabelAreaPosition::Left, 40)
+        .set_label_area_size(LabelAreaPosition::Bottom, 40)
+        .caption("Bottom", ("sans-serif", 40))
+        .build_cartesian_2d(
+            success_rate_bounding_box.x_min..success_rate_bounding_box.x_max,
+            success_rate_bounding_box.y_min..success_rate_bounding_box.y_max,
+        )?;
+    ctx_bottom.configure_mesh().draw()?;
+
+    ctx_bottom.draw_series(LineSeries::new(
+        stats
+            .iter()
+            .map(|exp| ((exp.concurrent_load as f64), exp.avg_success_rate)),
+        &BLUE,
+    ))?;
+
+    ctx_bottom.draw_series(stats.iter().map(|exp| {
+        ErrorBar::new_vertical(
+            exp.concurrent_load as f64,
+            exp.avg_success_rate - exp.std_dev_success_rate,
+            exp.avg_success_rate,
+            exp.avg_success_rate + exp.std_dev_success_rate,
             BLUE.filled(),
             20,
         )
