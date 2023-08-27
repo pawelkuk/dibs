@@ -27,6 +27,8 @@ struct ExperimentResult {
     std_dev_exp_time_ms: f64,
     avg_reservation_time_ms: f64,
     std_dev_reservation_time_ms: f64,
+    avg_success_rate: f64,
+    std_dev_success_rate: f64,
 }
 
 #[derive(Debug, serde::Deserialize, Clone)]
@@ -103,8 +105,7 @@ fn calculate_statistics(data: HashMap<u32, Vec<Experiment>>) -> Vec<ExperimentRe
 
             let std_dev_reservation_time_ms =
                 (avg_reservation_time_squared - avg_reservation_time_ms.powi(2)).sqrt();
-
-            let sum_of_all_exp_times_squared = exps.into_iter().fold(0.0, |acc, e| {
+            let sum_of_all_exp_times_squared = exps.clone().into_iter().fold(0.0, |acc, e| {
                 acc + e.reservations.into_iter().fold(0.0, |acc, r| {
                     let new_val = (r.time + r.reservation_duration).powi(2);
                     if new_val > acc {
@@ -116,12 +117,36 @@ fn calculate_statistics(data: HashMap<u32, Vec<Experiment>>) -> Vec<ExperimentRe
             });
             let avg_exp_time_squared = sum_of_all_exp_times_squared / n_of_all_experiments as f64;
             let std_dev_exp_time_ms = (avg_exp_time_squared - avg_exp_time_ms.powi(2)).sqrt();
+
+            let sum_of_all_success_rates = exps.clone().into_iter().fold(0.0, |acc, e| {
+                acc + (e
+                    .reservations
+                    .clone()
+                    .into_iter()
+                    .fold(0.0, |acc, r| acc + r.was_successful as u32 as f64))
+                    / e.reservations.len() as f64
+            });
+            let avg_success_rate = sum_of_all_success_rates / n_of_all_experiments as f64;
+            let sum_of_all_success_rates_squared = exps.into_iter().fold(0.0, |acc, e| {
+                acc + ((e
+                    .reservations
+                    .clone()
+                    .into_iter()
+                    .fold(0.0, |acc, r| acc + r.was_successful as u32 as f64))
+                    / e.reservations.len() as f64)
+                    .sqrt()
+            });
+            let std_dev_success_rate =
+                (sum_of_all_success_rates_squared - avg_success_rate.powi(2)).sqrt();
+
             ExperimentResult {
                 concurrent_load,
                 avg_reservation_time_ms,
                 avg_exp_time_ms,
                 std_dev_exp_time_ms,
                 std_dev_reservation_time_ms,
+                avg_success_rate,
+                std_dev_success_rate,
             }
         })
         .collect::<Vec<ExperimentResult>>()
