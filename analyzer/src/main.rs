@@ -20,6 +20,7 @@ struct Experiment {
     path: String,
 }
 
+#[derive(Clone)]
 struct ExperimentResult {
     concurrent_load: u32,
     avg_exp_time_ms: f64,
@@ -152,17 +153,57 @@ fn uniq_concurrency_values(exp_with_data: &[Experiment]) -> Vec<u32> {
         .collect::<Vec<u32>>()
 }
 
+struct BoundingBox {
+    x_min: f64,
+    x_max: f64,
+    y_min: f64,
+    y_max: f64,
+}
+
+fn get_bounding_box(
+    data: Vec<ExperimentResult>,
+    choose_min_val: impl FnMut(&ExperimentResult) -> f64,
+    choose_max_val: impl FnMut(&ExperimentResult) -> f64,
+) -> BoundingBox {
+    let x_min = data.iter().map(|exp| exp.concurrent_load).min().unwrap() as f64;
+    let x_max = data.iter().map(|exp| exp.concurrent_load).max().unwrap() as f64;
+    let y_min = data
+        .iter()
+        .map(choose_min_val)
+        .min_by(|a, b| a.partial_cmp(b).unwrap())
+        .unwrap();
+    let y_max = data
+        .iter()
+        .map(choose_max_val)
+        .max_by(|a, b| a.partial_cmp(b).unwrap())
+        .unwrap();
+    BoundingBox {
+        x_min,
+        x_max,
+        y_min,
+        y_max,
+    }
+}
+
 fn graph_stats(stats: Vec<ExperimentResult>) -> Result<(), Box<dyn std::error::Error>> {
     let file_name: String = "graphs/stats.png".to_string();
     let root_area = BitMapBackend::new(file_name.as_str(), (600, 800)).into_drawing_area();
     root_area.fill(&WHITE)?;
     let (upper, lower_tmp) = root_area.split_vertically((64).percent());
     let (_, lower) = lower_tmp.split_vertically((10).percent());
+    let avg_exp_bounding_box = get_bounding_box(
+        stats.clone(),
+        |exp| exp.avg_exp_time_ms - exp.std_dev_exp_time_ms,
+        |exp| exp.avg_exp_time_ms + exp.std_dev_exp_time_ms,
+    );
     let mut ctx_upper = ChartBuilder::on(&upper)
         .set_label_area_size(LabelAreaPosition::Left, 40)
         .set_label_area_size(LabelAreaPosition::Bottom, 40)
         .caption("Upper", ("sans-serif", 40))
-        .build_cartesian_2d(0.0..30.0, 0.0..1000.0)?;
+        .build_cartesian_2d(
+            avg_exp_bounding_box.x_min..avg_exp_bounding_box.x_max,
+            avg_exp_bounding_box.y_min..avg_exp_bounding_box.y_max,
+        )?;
 
     ctx_upper.configure_mesh().draw()?;
     ctx_upper.draw_series(LineSeries::new(
@@ -182,12 +223,19 @@ fn graph_stats(stats: Vec<ExperimentResult>) -> Result<(), Box<dyn std::error::E
             20,
         )
     }))?;
-
+    let avg_res_bounding_box = get_bounding_box(
+        stats.clone(),
+        |exp| exp.avg_reservation_time_ms - exp.std_dev_reservation_time_ms,
+        |exp| exp.avg_reservation_time_ms + exp.std_dev_reservation_time_ms,
+    );
     let mut ctx_lower = ChartBuilder::on(&lower)
         .set_label_area_size(LabelAreaPosition::Left, 40)
         .set_label_area_size(LabelAreaPosition::Bottom, 40)
         .caption("Lower", ("sans-serif", 40))
-        .build_cartesian_2d(0.0..30.0, 0.0..1000.0)?;
+        .build_cartesian_2d(
+            avg_res_bounding_box.x_min..avg_res_bounding_box.x_max,
+            avg_res_bounding_box.y_min..avg_res_bounding_box.y_max,
+        )?;
 
     ctx_lower.configure_mesh().draw()?;
 
