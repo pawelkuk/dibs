@@ -50,26 +50,26 @@
 - [x] gather data for thesis
 - [ ] visualize data
   - [ ] high load
-    - [ ] time to reserve all seats (or almost all)
-      - [ ] avg
-      - [ ] std dev
-      - [ ] distribution
-    - [ ] time to complete a reservation
-      - [ ] avg
-      - [ ] std dev
+    - [x] time to reserve all seats (or almost all)
+      - [x] avg
+      - [x] std dev
+      - [x] distribution
+    - [x] time to complete a reservation
+      - [x] avg
+      - [x] std dev
       - [x] distribution
     - [ ] success/failure rate (status code >= 400)
       - [ ] avg
       - [ ] std dev
       - [ ] distribution
-  - [ ] small load
-    - [ ] time to reserve all seats (or almost all)
-      - [ ] avg
-      - [ ] std dev
-      - [ ] distribution
-    - [ ] time to complete a reservation
-      - [ ] avg
-      - [ ] std dev
+  - [x] small load
+    - [x] time to reserve all seats (or almost all)
+      - [x] avg
+      - [x] std dev
+      - [x] distribution
+    - [x] time to complete a reservation
+      - [x] avg
+      - [x] std dev
       - [x] distribution
     - [ ] success/failure rate (status code >= 400)
       - [ ] avg
