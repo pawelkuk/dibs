@@ -58,7 +58,11 @@ fn main() {
 
     let divided_exps = divide_experiments_into_buckets_by_load(exp_with_data, load_values);
 
-    calculate_statistics(divided_exps);
+    let stats = calculate_statistics(divided_exps);
+    match graph_stats(stats) {
+        Ok(_) => println!("Graphed stats"),
+        Err(e) => println!("Error: {}", e),
+    }
 }
 
 fn calculate_statistics(data: HashMap<u32, Vec<Experiment>>) -> Vec<ExperimentResult> {
@@ -146,6 +150,66 @@ fn uniq_concurrency_values(exp_with_data: &[Experiment]) -> Vec<u32> {
         .collect::<HashSet<_>>()
         .into_iter()
         .collect::<Vec<u32>>()
+}
+
+fn graph_stats(stats: Vec<ExperimentResult>) -> Result<(), Box<dyn std::error::Error>> {
+    let file_name: String = "graphs/stats.png".to_string();
+    let root_area = BitMapBackend::new(file_name.as_str(), (600, 800)).into_drawing_area();
+    root_area.fill(&WHITE)?;
+    let (upper, lower_tmp) = root_area.split_vertically((64).percent());
+    let (_, lower) = lower_tmp.split_vertically((10).percent());
+    let mut ctx_upper = ChartBuilder::on(&upper)
+        .set_label_area_size(LabelAreaPosition::Left, 40)
+        .set_label_area_size(LabelAreaPosition::Bottom, 40)
+        .caption("Upper", ("sans-serif", 40))
+        .build_cartesian_2d(0.0..30.0, 0.0..1000.0)?;
+
+    ctx_upper.configure_mesh().draw()?;
+    ctx_upper.draw_series(LineSeries::new(
+        stats
+            .iter()
+            .map(|exp| ((exp.concurrent_load as f64), exp.avg_exp_time_ms)),
+        &BLUE,
+    ))?;
+
+    ctx_upper.draw_series(stats.iter().map(|exp| {
+        ErrorBar::new_vertical(
+            exp.concurrent_load as f64,
+            exp.avg_exp_time_ms - exp.std_dev_exp_time_ms,
+            exp.avg_exp_time_ms,
+            exp.avg_exp_time_ms + exp.std_dev_exp_time_ms,
+            BLUE.filled(),
+            20,
+        )
+    }))?;
+
+    let mut ctx_lower = ChartBuilder::on(&lower)
+        .set_label_area_size(LabelAreaPosition::Left, 40)
+        .set_label_area_size(LabelAreaPosition::Bottom, 40)
+        .caption("Lower", ("sans-serif", 40))
+        .build_cartesian_2d(0.0..30.0, 0.0..1000.0)?;
+
+    ctx_lower.configure_mesh().draw()?;
+
+    ctx_lower.draw_series(LineSeries::new(
+        stats
+            .iter()
+            .map(|exp| ((exp.concurrent_load as f64), exp.avg_reservation_time_ms)),
+        &BLUE,
+    ))?;
+
+    ctx_lower.draw_series(stats.iter().map(|exp| {
+        ErrorBar::new_vertical(
+            exp.concurrent_load as f64,
+            exp.avg_reservation_time_ms - exp.std_dev_reservation_time_ms,
+            exp.avg_reservation_time_ms,
+            exp.avg_reservation_time_ms + exp.std_dev_reservation_time_ms,
+            BLUE.filled(),
+            20,
+        )
+    }))?;
+
+    Ok(())
 }
 
 fn graph_reservations_in_time(experiment: Experiment) -> Result<(), Box<dyn std::error::Error>> {
