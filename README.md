@@ -48,8 +48,8 @@
 - [x] remove screening endpoint (mark as full)
 - [x] update benchmarking script to creating/deleting screenings
 - [x] gather data for thesis
-- [ ] visualize data
-  - [ ] high load
+- [x] visualize data
+  - [x] high load
     - [x] time to reserve all seats (or almost all)
       - [x] avg
       - [x] std dev
@@ -58,10 +58,10 @@
       - [x] avg
       - [x] std dev
       - [x] distribution
-    - [ ] success/failure rate (status code >= 400)
-      - [ ] avg
-      - [ ] std dev
-      - [ ] distribution
+    - [x] success/failure rate (status code >= 400)
+      - [x] avg
+      - [x] std dev
+      - [x] distribution
   - [x] small load
     - [x] time to reserve all seats (or almost all)
       - [x] avg
@@ -71,18 +71,18 @@
       - [x] avg
       - [x] std dev
       - [x] distribution
-    - [ ] success/failure rate (status code >= 400)
-      - [ ] avg
-      - [ ] std dev
-      - [ ] distribution
+    - [x] success/failure rate (status code >= 400)
+      - [x] avg
+      - [x] std dev
+      - [x] distribution
 - [ ] write thesis
-  - [ ] abstract
-  - [ ] introduction
-  - [ ] related work
-  - [ ] system design
-  - [ ] implementation
-  - [ ] evaluation
-  - [ ] conclusion
+  - [ ] abstract,
+  - [ ] introduction,
+  - [ ] related work,
+  - [ ] system design,
+  - [ ] implementation,
+  - [ ] evaluation,
+  - [ ] conclusion,
   - [ ] bibliography
   - [ ] acknowledgements
   - [ ] appendix
