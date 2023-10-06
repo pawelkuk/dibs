@@ -56,6 +56,12 @@ Postgres does not support distributed transaction by default. It needs to be con
 
 ### Postgres database connection configuration
 
+Postgres can run out of connections. This is a problem because the application will not be able to connect to the database. It can be solved in two ways. Either by running a connection pooler (like PgBouncer) in front of the database or by increasing the number of connections in the postgres configuration file. I oped for the second approach. This was implemented by setting the `max_connections` parameter to a higher value. This parameter controls the maximum number of concurrent connections to the database server. Setting it to a higher value has also its drawbacks. It increases the memory usage of the database server. It also increases the number of locks the database server has to manage. This can lead to performance issues. However, finding an optimal values for this parameter and handling the performance issues is out of scope of this thesis.
+
 ### Webserver configuration (connection pool, number of workers, etc.)
 
 ### Reverse proxy configuration
+
+### Too many websockets connections creation
+
+React rebuilds the DOM tree every time the state changes. This means that every time the state changes the DOM tree is rebuilt and all the components are recreated. This means that every time the state changes the websocket connection is recreated. This is a problem because the backend application has a limit on the number of websocket connections it can handle. This means that if the state changes too often then the backend application will not be able to handle all the websocket connections. This bug was caused due to placing the websocket connection creation logic in a react hook component which get rerendered every time the state changes. I solved this problem by moving the websocket connection creation logic to a react component which only gets rerendered at the appropriate time. This means that the websocket connection is created only once on screening room entering.
