@@ -1,5 +1,9 @@
 # Master thesis
 
+## Architecture
+
+![Architecture diagram](thesis/assets/dibs-architecture.png "Architecture diagram")
+
 ## TODO:
 
 - [x] pgadmin init config

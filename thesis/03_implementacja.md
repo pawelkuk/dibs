@@ -44,13 +44,15 @@ The difference between the distributed saga pattern and the two phase commit pro
 
 ## Implementation details
 
-## Application description
-
 ## Problems and pitfalls
 
 ### n+1 query problem and unnecessary queries in Django ORM
 
+The N+1 query problem is a common problem in ORMs. It happens when the ORM executes N+1 queries instead of 1 query. For example, when we want to get all the reserved seats and for each screening. In this case the ORM will execute 1 query to get all the screenings and then N queries to get all the reservation seats for each screening. This is a problem because it lead to performance issues and it does not reflect the sql queries created by SqlAlchemy. I solved the problem by rewriting the logic in SqlAlchemy where I could take advantage of eagerly loading this foreign key relationship. This results in 1 big query instead of N+1 small queries.
+
 ### Postgres instances configuration for distributed transactions
+
+Postgres does not support distributed transaction by default. It needs to be configured first. In order to do so I had to configure the postgres instances to use the 2 phase commit protocol. This required setting the `max_prepared_transactions` GUC parameter to a non-zero value. It controls the upper bound of the number of foreign transactions the coordinator server controls. Since one transaction could accesses multiple foreign servers, this parameter has to be set to: `(max_connections) * (# of foreign servers that are capable of 2PC)` ([source](https://wiki.postgresql.org/wiki/Atomic_Commit_of_Distributed_Transactions)). The other participant instances have to set the `max_prepared_transactions` to `max_connections` of the coordinator. After this SqlAlchemy can be configured to use the 2 phase commit protocol as well by setting `twophase=True` in the sessionmaker ([source](https://docs.sqlalchemy.org/en/20/orm/session_transaction.html#enabling-two-phase-commit)).
 
 ### Postgres database connection configuration
 
