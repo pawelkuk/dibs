@@ -6,9 +6,7 @@
 
 ### Expected problems
 
-## Choreography
-
-## Orchestration
+## Choreography vs. Orchestration
 
 ## Two phase commit protocol
 

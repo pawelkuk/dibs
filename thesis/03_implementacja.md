@@ -58,9 +58,13 @@ Postgres does not support distributed transaction by default. It needs to be con
 
 Postgres can run out of connections. This is a problem because the application will not be able to connect to the database. It can be solved in two ways. Either by running a connection pooler (like PgBouncer) in front of the database or by increasing the number of connections in the postgres configuration file. I oped for the second approach. This was implemented by setting the `max_connections` parameter to a higher value. This parameter controls the maximum number of concurrent connections to the database server. Setting it to a higher value has also its drawbacks. It increases the memory usage of the database server. It also increases the number of locks the database server has to manage. This can lead to performance issues. However, finding an optimal values for this parameter and handling the performance issues is out of scope of this thesis.
 
-### Webserver configuration (connection pool, number of workers, etc.)
+### Webserver configuration (number of workers)
+
+To complete a saga workflow the backend application has to execute multiple steps. Each step in the saga is a separate http request to the backend application. If the number of worker threads is too low then the backend application will not be able to accept the request in time and timeout the request. This will lead to the saga workflow not being completed. If the number of workers is too high then the backend application has other problems. The web server is limited by available resources of the underlying host. If the number of concurrent requests is too big then this leads to a big memory footprint, a greater cost for context switching and eventually to greater time for request processing/timeouts. This will lead to the saga workflow not getting completed. Finding an optimal value for the number of worker processes/threads is out of scope of this thesis. It was enough to set the number of workers to a high value (20 processes \* 5 thread per process = 100 worker threads) to prevent requests from being timed out/not accepted at all.
 
 ### Reverse proxy configuration
+
+It was enough to set the number of workers to a higher value then the number of workers in the backend application. This was done by setting the `maxconn` parameter to a higher value. This parameter controls the maximum number of concurrent connections to the backend application. Setting it to a higher value has also its drawbacks. It increases the memory usage of the reverse proxy server. It also increases the number of locks the reverse proxy server has to manage. This can lead to performance issues. However, no problems of this sort were encountered during the experiment.
 
 ### Too many websockets connections creation
 
