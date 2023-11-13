@@ -4,15 +4,29 @@ The idea of a saga was introduced by Hector Garcia-Molina and Kenneth Salem in 1
 
 ## Distributed Saga
 
-The paper discusses only the case of a single instance database. It says:
+The original saga paper says:
 
 > Due to space limitations, we only discuss sagas in a centralized system, although clearly they can be implemented in a distributed database system.
+
+Whereas this is objectively true it dismisses the fact that there are some major design decisions that have to be made when implementing distributed sagas. Those result in different trade-offs and different guarantees and overall performance and throughput characteristics. The degrees of freedom that have to be considered are:
+
+- orchestration vs. choreography,
+- synchronous vs. asynchronous communication,
+- persistence vs. in-memory.
+
+For simplicity's sake, this thesis is concerned only with the orchestrated, synchronous and in-memory approach.
+
+### Orchestration vs. Choreography
+
+### Synchronous vs. Asynchronous communication
+
+### Persistence vs. In-memory
+
+TODO - write about the existent solutions on the market
 
 ### Advantages and Drawbacks of using Sagas
 
 ### Expected problems
-
-## Choreography vs. Orchestration
 
 ## Two phase commit protocol
 
